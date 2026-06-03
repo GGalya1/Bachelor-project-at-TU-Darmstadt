@@ -11,8 +11,8 @@ public class FontManager : MonoBehaviour
     public class FontGroup
     {
         public string groupName;
-        public string tableCollectionName = "Font Table"; // имя таблицы
-        public string entryName;                          // ключ, например "titanBoldFont"
+        public string tableCollectionName = "Font Table"; // table name
+        public string entryName;                          // key, for example: "titanBoldFont"
         public List<TextMeshProUGUI> labels;
     }
 
@@ -31,7 +31,7 @@ public class FontManager : MonoBehaviour
 
     private IEnumerator InitializeFonts()
     {
-        // ждём пока локализация инициализируется
+        // Waiting for the localization to initialize
         yield return LocalizationSettings.InitializationOperation;
         ApplyAllFonts(LocalizationSettings.SelectedLocale);
     }
@@ -56,7 +56,7 @@ public class FontManager : MonoBehaviour
 
             if (op.Result == null)
             {
-                Debug.LogWarning($"[FontManager] Шрифт не найден: {group.tableCollectionName}/{group.entryName}");
+                Debug.LogWarning($"[FontManager] Font not found: {group.tableCollectionName}/{group.entryName}");
                 continue;
             }
 

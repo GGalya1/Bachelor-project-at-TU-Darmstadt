@@ -53,7 +53,7 @@ public class MuiltiplexerVizualizer: BaseVizualizer
     }
     protected override void InitializePanelController()
     {
-        // Специфичная для этого класса инициализация контроллера
+        // Controller initialization specific to this class
         _uiController = _panelInstance.GetComponent<MultiplexerControlPanel>();
         if (_uiController == null)
         {

@@ -71,7 +71,7 @@ public class CameraController : MonoBehaviour
 
             isDraggingCamera = true;
             lastInputPosition = currentPos;
-            targetPosition = cachedTransform.position; // Сбрасываем таргет на текущую позицию
+            targetPosition = cachedTransform.position; // РЎР±СЂР°СЃС‹РІР°РµРј С‚Р°СЂРіРµС‚ РЅР° С‚РµРєСѓС‰СѓСЋ РїРѕР·РёС†РёСЋ
         }
 
         // Holding
@@ -85,7 +85,7 @@ public class CameraController : MonoBehaviour
             targetPosition.x -= moveX;
             targetPosition.z -= moveZ;
 
-            // Ограничиваем движение
+            // РћРіСЂР°РЅРёС‡РёРІР°РµРј РґРІРёР¶РµРЅРёРµ
             targetPosition.x = Mathf.Clamp(targetPosition.x, minX, maxX);
             targetPosition.z = Mathf.Clamp(targetPosition.z, minZ, maxZ);
 
@@ -166,7 +166,7 @@ public class CameraController : MonoBehaviour
     {
         float zoomAmount = 0;
 
-        // 1. Для ПК (Колесо мыши)
+        // For PC (Mouse wheel)
         if (Mouse.current != null)
         {
             float scroll = Mouse.current.scroll.ReadValue().y;
@@ -176,12 +176,12 @@ public class CameraController : MonoBehaviour
             }
         }
 
-        // 2. Для Телефонов (Pinch Zoom)
+        // For Phones (Pinch Zoom)
         if (Touchscreen.current != null)
         {
             var touches = Touchscreen.current.touches;
 
-            // Проверяем, что как минимум два пальца активны
+            // We check that at least two fingers are active
             if (touches[0].isInProgress && touches[1].isInProgress)
             {
                 var t1 = touches[0];
@@ -192,17 +192,17 @@ public class CameraController : MonoBehaviour
                 Vector2 t1Delta = t1.delta.ReadValue();
                 Vector2 t2Delta = t2.delta.ReadValue();
 
-                // Позиции в предыдущем кадре
+                // Positions in the previous frame
                 Vector2 t1PrevPos = t1Pos - t1Delta;
                 Vector2 t2PrevPos = t2Pos - t2Delta;
 
                 float prevDist = Vector2.Distance(t1PrevPos, t2PrevPos);
                 float curDist = Vector2.Distance(t1Pos, t2Pos);
 
-                // Используем zoomSensitivity для тача (обычно нужно значение побольше, чем для мыши)
+                // We use zoomSensitivity for touch input (you usually need a higher value than for a mouse)
                 zoomAmount = (curDist - prevDist) * zoomSensitivity;
 
-                // Важно: когда зумим двумя пальцами, отключаем перемещение камеры
+                // Important: When zooming with two fingers, disable camera movement
                 isDraggingCamera = false;
             }
         }
@@ -212,7 +212,7 @@ public class CameraController : MonoBehaviour
             Vector3 moveDirection = cam.transform.forward;
             Vector3 newTarget = targetPosition + moveDirection * zoomAmount;
 
-            // Ограничение по высоте
+            // Height restriction
             if (newTarget.y >= minHeight && newTarget.y <= maxHeight)
             {
                 targetPosition = newTarget;
