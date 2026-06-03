@@ -1,36 +1,39 @@
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Serialization;
 
 // An abstract base class for all component rendering
 public abstract class BaseVizualizer : MonoBehaviour, IVizualizer
 {
     // --- FIELDS FOR CONFIGURATION (Visible in Inspector) ---
 
-    [SerializeField] protected GameObject _panelInstance;
-    [SerializeField] private CanvasGroup _panelCanvasGroup;
+    [FormerlySerializedAs("_panelInstance")] [SerializeField] protected GameObject panelInstance;
+    [FormerlySerializedAs("_panelCanvasGroup")] [SerializeField] private CanvasGroup panelCanvasGroup;
 
+    [FormerlySerializedAs("_selectionColor")]
     [Header("Visual Settings")]
-    [SerializeField] protected Color _selectionColor = Color.blue;
+    [SerializeField] protected Color selectionColor = Color.blue;
 
+    [FormerlySerializedAs("_animDuration")]
     [Header("Animation Settings")]
-    [SerializeField] private float _animDuration = 0.25f;
-    [SerializeField] private float _moveDistance = 0.2f;
+    [SerializeField] private float animDuration = 0.25f;
+    [FormerlySerializedAs("_moveDistance")] [SerializeField] private float moveDistance = 0.2f;
 
     // --- FIELDS FOR CACHED REFERENCES ---
 
     // Cached main camera, for UI positioning
-    protected Camera _staticCamera;
+    protected Camera StaticCamera;
 
     // Cached renderer, if you need to change the model's color (for a simple color change)
-    [SerializeField] protected Renderer _bigModelRenderer;
+    [FormerlySerializedAs("_bigModelRenderer")] [SerializeField] protected Renderer bigModelRenderer;
 
     // A flag indicating whether the visualization is currently active
-    protected bool isVisualizationActive = false;
+    protected bool IsVisualizationActive = false;
     private Vector3 _targetLocalPos;
 
     // --- PUBLIC PROPERTIES (Read-Only access to configuration) ---
 
-    public GameObject PanelPrefab => _panelInstance;
+    public GameObject PanelPrefab => panelInstance;
 
     // --- OPTIMIZATION FIELDS ---
     private Color _originalColor;
@@ -43,20 +46,20 @@ public abstract class BaseVizualizer : MonoBehaviour, IVizualizer
     {
         _propBlock = new MaterialPropertyBlock();
 
-        if (_bigModelRenderer != null)
+        if (bigModelRenderer != null)
         {
-            _originalColor = _bigModelRenderer.sharedMaterial.color;
+            _originalColor = bigModelRenderer.sharedMaterial.color;
         }
 
         // 2. Camera caching
-        _staticCamera = Camera.main;
-        if (_staticCamera == null)
+        StaticCamera = Camera.main;
+        if (StaticCamera == null)
         {
             Debug.LogError($"Main camera not found by {gameObject.name}!");
         }
 
         // 3. Creating and initializing the UI panel
-        _targetLocalPos = _panelInstance.transform.localPosition;
+        _targetLocalPos = panelInstance.transform.localPosition;
         PrepareHiddenState();
 
         // An abstract method that must be implemented by a subclass
@@ -68,48 +71,48 @@ public abstract class BaseVizualizer : MonoBehaviour, IVizualizer
     // ShowData and HideData share the same basic logic, but ShowData has some specific features
     public virtual void ShowData()
     {
-        if (isVisualizationActive)
+        if (IsVisualizationActive)
         {
             HideData();
             return;
         }
 
         // General logic
-        isVisualizationActive = true;
-        SetModelColor(_selectionColor);
+        IsVisualizationActive = true;
+        SetModelColor(selectionColor);
 
-        _panelInstance.transform.DOKill();
-        _panelCanvasGroup.DOKill();
+        panelInstance.transform.DOKill();
+        panelCanvasGroup.DOKill();
 
-        _panelInstance.transform.DOLocalMove(_targetLocalPos, _animDuration).SetEase(Ease.OutCubic);
-        _panelCanvasGroup.DOFade(1f, _animDuration).SetEase(Ease.OutCubic).OnComplete(() => {
-            _panelCanvasGroup.interactable = true;
-            _panelCanvasGroup.blocksRaycasts = true;
+        panelInstance.transform.DOLocalMove(_targetLocalPos, animDuration).SetEase(Ease.OutCubic);
+        panelCanvasGroup.DOFade(1f, animDuration).SetEase(Ease.OutCubic).OnComplete(() => {
+            panelCanvasGroup.interactable = true;
+            panelCanvasGroup.blocksRaycasts = true;
         });
     }
 
     public virtual void HideData()
     {
-        isVisualizationActive = false;
+        IsVisualizationActive = false;
         SetModelColor(_originalColor);
 
-        _panelCanvasGroup.interactable = false;
-        _panelCanvasGroup.blocksRaycasts = false;
+        panelCanvasGroup.interactable = false;
+        panelCanvasGroup.blocksRaycasts = false;
 
-        _panelInstance.transform.DOKill();
-        _panelCanvasGroup.DOKill();
+        panelInstance.transform.DOKill();
+        panelCanvasGroup.DOKill();
 
-        _panelCanvasGroup.DOFade(0f, _animDuration).SetEase(Ease.InCubic);
-        _panelInstance.transform.DOLocalMove(_targetLocalPos - Vector3.up * _moveDistance, _animDuration)
+        panelCanvasGroup.DOFade(0f, animDuration).SetEase(Ease.InCubic);
+        panelInstance.transform.DOLocalMove(_targetLocalPos - Vector3.up * moveDistance, animDuration)
                 .SetEase(Ease.InCubic);  
     }
     private void SetModelColor(Color color)
     {
-        if (_bigModelRenderer == null) return;
+        if (bigModelRenderer == null) return;
 
-        _bigModelRenderer.GetPropertyBlock(_propBlock);
+        bigModelRenderer.GetPropertyBlock(_propBlock);
         _propBlock.SetColor(ColorPropertyID, color);
-        _bigModelRenderer.SetPropertyBlock(_propBlock);
+        bigModelRenderer.SetPropertyBlock(_propBlock);
     }
 
     // Abstract methods that must be implemented in subclasses
@@ -120,10 +123,10 @@ public abstract class BaseVizualizer : MonoBehaviour, IVizualizer
 
     private void PrepareHiddenState()
     {
-        _panelCanvasGroup.alpha = 0;
-        _panelCanvasGroup.interactable = false;
-        _panelCanvasGroup.blocksRaycasts = false;
+        panelCanvasGroup.alpha = 0;
+        panelCanvasGroup.interactable = false;
+        panelCanvasGroup.blocksRaycasts = false;
 
-        _panelInstance.transform.localPosition = _targetLocalPos - Vector3.up * _moveDistance;
+        panelInstance.transform.localPosition = _targetLocalPos - Vector3.up * moveDistance;
     }
 }

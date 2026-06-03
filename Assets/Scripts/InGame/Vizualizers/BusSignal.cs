@@ -24,7 +24,7 @@ public class BusSignal : BaseVizualizer
 
     protected override void InitializePanelController()
     {
-        _uiController = _panelInstance.GetComponent<InfoPanelUI>();
+        _uiController = panelInstance.GetComponent<InfoPanelUI>();
         if (_uiController == null)
         {
             Debug.LogError($"InfoPanelUI component not found on the prefab for {gameObject.name}!");

@@ -2,28 +2,28 @@ using TMPro;
 using UnityEngine;
 using static UnityEngine.Rendering.HDROutputUtils;
 
-public class ExternderVizualizer : ALUVizualiser
+public class ExternderVizualizer : AluVizualiser
 {
     protected override void Awake()
     {
         base.Awake();
 
-        if (_uiController != null)
+        if (uiController != null)
         {
-            _uiController.Setup("Extender");
+            uiController.Setup("Extender");
         }
 
-        _uiController.FirstOperationButton.onClick.AddListener(() => ChooseExtenderType(0));
-        _uiController.SecondOperationButton.onClick.AddListener(() => ChooseExtenderType(1));
-        _uiController.ThirdOperationButton.onClick.AddListener(() => ChooseExtenderType(2));
-        _uiController.FourthOperationButton.onClick.AddListener(() => ChooseExtenderType(3));
+        uiController.FirstOperationButton.onClick.AddListener(() => ChooseExtenderType(0));
+        uiController.SecondOperationButton.onClick.AddListener(() => ChooseExtenderType(1));
+        uiController.ThirdOperationButton.onClick.AddListener(() => ChooseExtenderType(2));
+        uiController.FourthOperationButton.onClick.AddListener(() => ChooseExtenderType(3));
 
         ResetVizualization();
     }
     protected override void InitializePanelController()
     {
-        _uiController = _panelInstance.GetComponent<ALUControlPanel>();
-        if (_uiController == null)
+        uiController = panelInstance.GetComponent<AluControlPanel>();
+        if (uiController == null)
         {
             Debug.LogError($"ExtenderControlPanel component not found on the prefab for {gameObject.name}!");
         }
@@ -52,12 +52,12 @@ public class ExternderVizualizer : ALUVizualiser
                 break;
         }
 
-        _symbolForOperation.text = symbol;
-        _operation = operationType;
+        symbolForOperation.text = symbol;
+        Operation = operationType;
 
-        if (!_operationBanner.activeSelf)
+        if (!operationBanner.activeSelf)
         {
-            _operationBanner.SetActive(true);
+            operationBanner.SetActive(true);
         }
     }
 }

@@ -53,8 +53,8 @@ public class LanguageManager : MonoBehaviour
     public void CycleLocale()
     {
         var locales = LocalizationSettings.AvailableLocales.Locales;
-        int current = locales.IndexOf(LocalizationSettings.SelectedLocale);
-        int next = (current + 1) % locales.Count;
+        var current = locales.IndexOf(LocalizationSettings.SelectedLocale);
+        var next = (current + 1) % locales.Count;
         SetLocale(locales[next].Identifier.Code);
     }
 
@@ -79,7 +79,7 @@ public class LanguageManager : MonoBehaviour
     {
         if (PlayerPrefs.HasKey(PREFS_KEY))
         {
-            string saved = PlayerPrefs.GetString(PREFS_KEY);
+            var saved = PlayerPrefs.GetString(PREFS_KEY);
             StartCoroutine(SetLocaleCoroutine(saved));
         }
         else
@@ -91,7 +91,7 @@ public class LanguageManager : MonoBehaviour
 
     private void AutoDetectLocale()
     {
-        string code = Application.systemLanguage switch
+        var code = Application.systemLanguage switch
         {
             SystemLanguage.Russian => "ru",
             SystemLanguage.English => "en",

@@ -1,5 +1,6 @@
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Handles smooth transitions for menu panels using CanvasGroup and RectTransform.
@@ -7,12 +8,14 @@ using DG.Tweening;
 /// </summary>
 public class MenuAnimationManager : MonoBehaviour
 {
+    [FormerlySerializedAs("_fadeTime")]
     [Header("Animation Settings")]
     [Tooltip("Duration of the show/hide animations.")]
-    [SerializeField] private float _fadeTime = 0.3f;
+    [SerializeField] private float fadeTime = 0.3f;
 
+    [FormerlySerializedAs("_hiddenPosition")]
     [Tooltip("The vertical offset for the panel's hidden state.")]
-    [SerializeField] private Vector2 _hiddenPosition = new Vector2(0f, -1000f);
+    [SerializeField] private Vector2 hiddenPosition = new Vector2(0f, -1000f);
 
     [Header("References")]
     [SerializeField] private CanvasGroup bgGroup;
@@ -46,7 +49,7 @@ public class MenuAnimationManager : MonoBehaviour
         group.alpha = 0f;
         group.interactable = false;
         group.blocksRaycasts = false;
-        transform.anchoredPosition = _hiddenPosition;
+        transform.anchoredPosition = hiddenPosition;
     }
 
     /// <summary>
@@ -62,35 +65,35 @@ public class MenuAnimationManager : MonoBehaviour
         group.interactable = true;
         group.blocksRaycasts = true;
 
-        transform.DOAnchorPos(Vector2.zero, _fadeTime).SetEase(showEase);
-        group.DOFade(1, _fadeTime);
+        transform.DOAnchorPos(Vector2.zero, fadeTime).SetEase(showEase);
+        group.DOFade(1, fadeTime);
     }
 
     public void ShowLevelPanel()
     {
-        ShowBG();
+        ShowBg();
         ShowPanel(levelPanelRectTransform, levelPanelGroup);
     }
     public void ShowOptionsPanel() {
-        ShowBG();
+        ShowBg();
         ShowPanel(optionsPanelRectTransform, optionsPanelGroup);
     }
 
-    public void ShowBG() {
+    public void ShowBg() {
         bgGroup.DOKill();
 
         bgGroup.interactable = true;
         bgGroup.blocksRaycasts = true;
 
-        bgGroup.DOFade(1, _fadeTime);
+        bgGroup.DOFade(1, fadeTime);
     }
-    public void HideBG()
+    public void HideBg()
     {
         bgGroup.DOKill();
 
         bgGroup.interactable = false;
 
-        bgGroup.DOFade(0f, _fadeTime).OnComplete(() =>
+        bgGroup.DOFade(0f, fadeTime).OnComplete(() =>
         {
             bgGroup.blocksRaycasts = false;
             bgGroup.interactable = false;
@@ -106,21 +109,21 @@ public class MenuAnimationManager : MonoBehaviour
 
         group.interactable = false;
 
-        transform.DOAnchorPos(_hiddenPosition, _fadeTime).SetEase(hideEase);
+        transform.DOAnchorPos(hiddenPosition, fadeTime).SetEase(hideEase);
 
         // Fade out and disable blocksRaycasts only when finished
-        group.DOFade(0f, _fadeTime).OnComplete(() =>
+        group.DOFade(0f, fadeTime).OnComplete(() =>
         {
             group.blocksRaycasts = false;
         });
     }
     public void HideLevelPanel()
     {
-        HideBG();
+        HideBg();
         HidePanel(levelPanelRectTransform, levelPanelGroup);
     }
     public void HideOptionsPanel() {
-        HideBG();
+        HideBg();
         HidePanel(optionsPanelRectTransform, optionsPanelGroup);
     }
 

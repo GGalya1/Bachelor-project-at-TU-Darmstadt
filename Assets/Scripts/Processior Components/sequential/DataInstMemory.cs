@@ -19,16 +19,16 @@ public class DataInstMemory
     #endregion
 
     // all information is stored as a pair (adress - object). For Objects stays instructions and data
-    public Dictionary<int, int> _memory = new Dictionary<int, int>();
+    public Dictionary<int, int> Memory = new Dictionary<int, int>();
 
     public void LoadWord(int adress, int data) { 
-        _memory[adress] = data;
+        Memory[adress] = data;
     }
 
     #region Sequential logic
     public void PreClockUpdate() {
-        if (_memory.ContainsKey(Adress)) {
-            ReadData = _memory[Adress];
+        if (Memory.ContainsKey(Adress)) {
+            ReadData = Memory[Adress];
         }
         else {
             ReadData = 0;
@@ -37,7 +37,7 @@ public class DataInstMemory
 
     public void Clock() {
         if (MemoryWrite) {
-            _memory[Adress] = WriteData;
+            Memory[Adress] = WriteData;
         }
     }
     #endregion

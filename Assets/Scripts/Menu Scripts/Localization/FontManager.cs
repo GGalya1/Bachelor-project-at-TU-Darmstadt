@@ -43,7 +43,7 @@ public class FontManager : MonoBehaviour
 
     private async void ApplyAllFonts(Locale locale)
     {
-        bool isRTL = locale.Identifier.Code == "ar";
+        var isRtl = locale.Identifier.Code == "ar";
 
         foreach (var group in fontGroups)
         {
@@ -63,7 +63,7 @@ public class FontManager : MonoBehaviour
             foreach (var label in group.labels)
             {
                 label.font = op.Result;
-                label.isRightToLeftText = isRTL;
+                label.isRightToLeftText = isRtl;
             }
         }
     }

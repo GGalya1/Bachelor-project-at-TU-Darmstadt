@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-
+using UnityEngine.Serialization;
 using Gyroscope = UnityEngine.InputSystem.Gyroscope;
 
 /// <summary>
@@ -9,12 +9,14 @@ using Gyroscope = UnityEngine.InputSystem.Gyroscope;
 /// </summary>
 public class MenuParallax : MonoBehaviour
 {
+    [FormerlySerializedAs("_amount")]
     [Header("Parallax Settings")]
     [Tooltip("Maximum displacement distance from the starting position.")]
-    [SerializeField] float _amount = 20f;
+    [SerializeField] float amount = 20f;
 
+    [FormerlySerializedAs("_smoothTime")]
     [Tooltip("How smoothly the element follows the mouse (lower is faster).")]
-    [SerializeField] float _smoothTime = 0.3f;
+    [SerializeField] float smoothTime = 0.3f;
 
 #if UNITY_ANDROID || UNITY_IOS
     [Header("Mobile Settings")]
@@ -58,16 +60,16 @@ public class MenuParallax : MonoBehaviour
 #else
         if (_mouse == null) return;
 
-        Vector2 mousePos = _mouse.position.ReadValue();
+        var mousePos = _mouse.position.ReadValue();
         
         // Convert mouse position to a normalized range: [-0.5, 0.5]
-        Vector2 mousePercent = new Vector2(
+        var mousePercent = new Vector2(
             (mousePos.x / Screen.width) - 0.5f,
             (mousePos.y / Screen.height) - 0.5f
         );
 
         // Calculate the target position relative to the starting anchor
-        Vector2 targetPos = _startPos + (mousePercent * _amount);
+        var targetPos = _startPos + (mousePercent * amount);
 #endif
 
 
@@ -77,7 +79,7 @@ public class MenuParallax : MonoBehaviour
             _rectTransform.anchoredPosition,
             targetPos,
             ref _velocity,
-            _smoothTime
+            smoothTime
         );
     }
 }

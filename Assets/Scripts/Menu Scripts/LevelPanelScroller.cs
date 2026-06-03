@@ -1,6 +1,7 @@
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 
@@ -12,7 +13,7 @@ public class LevelPanelScroller : MonoBehaviour
 {
     [Header("References")]
     public ScrollRect scrollRect;
-    [SerializeField] private RectTransform _contentContainer;
+    [FormerlySerializedAs("_contentContainer")] [SerializeField] private RectTransform contentContainer;
 
     [Header("UI Text Settings")]
     public TMP_Text chapterTitleText;
@@ -24,7 +25,7 @@ public class LevelPanelScroller : MonoBehaviour
     public float duration = 0.5f;
     public Ease animEase = Ease.OutCubic;
 
-    private int currentPage = 0;
+    private int _currentPage = 0;
 
     // Minimum drag distance to trigger page swap
     public float dragThreshold;
@@ -36,9 +37,9 @@ public class LevelPanelScroller : MonoBehaviour
         dragThreshold = Screen.width / 15f;
 
         // Optional: Auto-calculate pages based on children count
-        if (_contentContainer != null && _contentContainer.childCount > 0)
+        if (contentContainer != null && contentContainer.childCount > 0)
         {
-            totalPages = _contentContainer.childCount;
+            totalPages = contentContainer.childCount;
         }
 
         if (chapterTitleText != null && chapterNames.Length > 0)
@@ -52,11 +53,11 @@ public class LevelPanelScroller : MonoBehaviour
     /// </summary>
     public void NextPage()
     {
-        if (currentPage < totalPages - 1)
+        if (_currentPage < totalPages - 1)
         {
-            currentPage++;
-            ScrollToPage(currentPage);
-            UpdateChapterTitle(currentPage);
+            _currentPage++;
+            ScrollToPage(_currentPage);
+            UpdateChapterTitle(_currentPage);
         }
     }
 
@@ -65,11 +66,11 @@ public class LevelPanelScroller : MonoBehaviour
     /// </summary>
     public void PreviousPage()
     {
-        if (currentPage > 0)
+        if (_currentPage > 0)
         {
-            currentPage--;
-            ScrollToPage(currentPage);
-            UpdateChapterTitle(currentPage);
+            _currentPage--;
+            ScrollToPage(_currentPage);
+            UpdateChapterTitle(_currentPage);
         }
     }
 
@@ -78,7 +79,7 @@ public class LevelPanelScroller : MonoBehaviour
     /// </summary>
     private void ScrollToPage(int pageIndex)
     {
-        float targetPos = totalPages > 1 ? (float)pageIndex / (totalPages - 1) : 0;
+        var targetPos = totalPages > 1 ? (float)pageIndex / (totalPages - 1) : 0;
 
         scrollRect.DOHorizontalNormalizedPos(targetPos, duration)
                   .SetEase(animEase)
@@ -89,7 +90,7 @@ public class LevelPanelScroller : MonoBehaviour
     {
         if (chapterTitleText == null || chapterNames.Length <= pageIndex) return;
 
-        Sequence titleSequence = DOTween.Sequence();
+        var titleSequence = DOTween.Sequence();
 
         titleSequence.Append(chapterTitleText.DOFade(0, fadeDuration))
                      .AppendCallback(() => {

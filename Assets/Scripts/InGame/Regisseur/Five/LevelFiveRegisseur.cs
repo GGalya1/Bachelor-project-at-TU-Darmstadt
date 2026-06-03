@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 
 public struct LevelFiveState
@@ -9,31 +10,32 @@ public struct LevelFiveState
     public int RegisterInstrValue;
     public int RegisterOutputValue;
 
-    public int firstMemoryValue;
-    public int secondMemoryValue;
-    public int thirdMemoryValue;
-    public int fourthMemoryValue;
+    public int FirstMemoryValue;
+    public int SecondMemoryValue;
+    public int ThirdMemoryValue;
+    public int FourthMemoryValue;
 
-    public bool RegisterPCWE;
-    public bool RegisterInstrWE;
-    public bool RegisterOutputWE;
+    public bool RegisterPcwe;
+    public bool RegisterInstrWe;
+    public bool RegisterOutputWe;
 
-    public int ALUOperation;
+    public int AluOperation;
 
     public int ExtenderOperation;
 }
 
 public class LevelFiveRegisseur : BaseLevelRegisseur
 {
+    [FormerlySerializedAs("_registerSrcAVisualizer")]
     [Header("Level 5 Specific Components")]
-    [SerializeField] private RegisterVizualizer _registerSrcAVisualizer;
-    [SerializeField] private RegisterVizualizer _registerSrcBVisualizer;
-    [SerializeField] private RegisterVizualizer _registerOutputVisualizer;
-    [SerializeField] private IntructionDataMemoryVizualizer _memoryVisualizer;
-    [SerializeField] private ALUVizualiser _aluVizualizer;
-    [SerializeField] private ExternderVizualizer _extenderVizualizer;
+    [SerializeField] private RegisterVizualizer registerSrcAVisualizer;
+    [FormerlySerializedAs("_registerSrcBVisualizer")] [SerializeField] private RegisterVizualizer registerSrcBVisualizer;
+    [FormerlySerializedAs("_registerOutputVisualizer")] [SerializeField] private RegisterVizualizer registerOutputVisualizer;
+    [FormerlySerializedAs("_memoryVisualizer")] [SerializeField] private IntructionDataMemoryVizualizer memoryVisualizer;
+    [FormerlySerializedAs("_aluVizualizer")] [SerializeField] private AluVizualiser aluVizualizer;
+    [FormerlySerializedAs("_extenderVizualizer")] [SerializeField] private ExternderVizualizer extenderVizualizer;
 
-    [SerializeField] private Blinker _blinkerNumber;
+    [FormerlySerializedAs("_blinkerNumber")] [SerializeField] private Blinker blinkerNumber;
 
     #region CACHED UI REFERENCES
     private InfoPanelUI _infoSrcARegister;
@@ -43,201 +45,201 @@ public class LevelFiveRegisseur : BaseLevelRegisseur
     #endregion
 
     // Intern components for computations
-    private Register srcA;
-    private Register srcB;
-    private Register output;
-    private DataInstMemory dataIntructionMemory;
+    private Register _srcA;
+    private Register _srcB;
+    private Register _output;
+    private DataInstMemory _dataIntructionMemory;
 
     protected override int RightAnswerValue => 66;
 
 
-    protected int _currentBus = 0; // [0, 6]
+    protected int CurrentBus = 0; // [0, 6]
 
     protected override void OnLevelStart()
     {
         // Initialization of logical components
-        srcA = new Register(0); srcA.WriteEnable = true;
-        srcB = new Register(0); srcB.WriteEnable = true;
-        output = new Register(0); output.WriteEnable = true;
+        _srcA = new Register(0); _srcA.WriteEnable = true;
+        _srcB = new Register(0); _srcB.WriteEnable = true;
+        _output = new Register(0); _output.WriteEnable = true;
 
-        dataIntructionMemory = new DataInstMemory(); dataIntructionMemory.MemoryWrite = true;
+        _dataIntructionMemory = new DataInstMemory(); _dataIntructionMemory.MemoryWrite = true;
 
-        dataIntructionMemory.LoadWord(0, 1048576239);                   // J-Typ (1000)
-        dataIntructionMemory.LoadWord(4, 4314211);                      // B-Typ (16)
-        dataIntructionMemory.LoadWord(8, 7603235);                      // S-Typ (8)
-        dataIntructionMemory.LoadWord(12, 4301059);                     // I-Typ (4)
+        _dataIntructionMemory.LoadWord(0, 1048576239);                   // J-Typ (1000)
+        _dataIntructionMemory.LoadWord(4, 4314211);                      // B-Typ (16)
+        _dataIntructionMemory.LoadWord(8, 7603235);                      // S-Typ (8)
+        _dataIntructionMemory.LoadWord(12, 4301059);                     // I-Typ (4)
 
         // Caching of UI panels for visualizers
-        _infoSrcARegister = _registerSrcAVisualizer.UIRegisterPanel;
-        _infoSrcBRegister = _registerSrcBVisualizer.UIRegisterPanel;
-        _infoOutputRegister = _registerOutputVisualizer.UIRegisterPanel;
+        _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
+        _infoSrcBRegister = registerSrcBVisualizer.UIRegisterPanel;
+        _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
 
-        _infoDataMemory = _memoryVisualizer.UIRegisterPanel;
+        _infoDataMemory = memoryVisualizer.UIRegisterPanel;
 
-        if (_levelTargetDescription == null || _levelTargetDescription.Length == 0) {
-            _levelTargetText.text = $"Ziel: \r\nExtende alle Werte aus dem Speicher korrekt und lege in Register 3.";
+        if (levelTargetDescription == null || levelTargetDescription.Length == 0) {
+            levelTargetText.text = $"Ziel: \r\nExtende alle Werte aus dem Speicher korrekt und lege in Register 3.";
         }
         else {
-            _levelTargetText.text = _levelTargetDescription;
+            levelTargetText.text = levelTargetDescription;
         }
             
 
-        _memoryVisualizer.UIRegisterPanel.Display($"{dataIntructionMemory._memory[0]}", $"{dataIntructionMemory._memory[4]}", $"{dataIntructionMemory._memory[8]}", $"{dataIntructionMemory._memory[12]}");
+        memoryVisualizer.UIRegisterPanel.Display($"{_dataIntructionMemory.Memory[0]}", $"{_dataIntructionMemory.Memory[4]}", $"{_dataIntructionMemory.Memory[8]}", $"{_dataIntructionMemory.Memory[12]}");
         UpdateVizualizers();
     }
 
     protected override IEnumerator RunBusVisualizations() 
     {
-        if (_currentBus >= 0 && _currentBus < _maxTickNumber)
+        if (CurrentBus >= 0 && CurrentBus < maxTickNumber)
         {
-            _busController.StartBusSignal(_busController.busSegments[0], srcA.Output);
-            _busController.StartBusSignal(_busController.busSegments[4], srcA.Output);
-            _busController.StartBusSignal(_busController.busSegments[5], 4);
+            busController.StartBusSignal(busController.busSegments[0], _srcA.Output);
+            busController.StartBusSignal(busController.busSegments[4], _srcA.Output);
+            busController.StartBusSignal(busController.busSegments[5], 4);
 
-            if (dataIntructionMemory._memory.ContainsKey(srcA.Output))
+            if (_dataIntructionMemory.Memory.ContainsKey(_srcA.Output))
             {
-                yield return StartCoroutine(DelayedBusSignals(_busController.busSegments[1], _busController.busSegments[6], dataIntructionMemory._memory[srcA.Output], ALU.calculate(srcA.Output, 4, _aluVizualizer.CurrentALUOperation)));
+                yield return StartCoroutine(DelayedBusSignals(busController.busSegments[1], busController.busSegments[6], _dataIntructionMemory.Memory[_srcA.Output], Alu.Calculate(_srcA.Output, 4, aluVizualizer.CurrentAluOperation)));
             }
             else
             {
-                yield return StartCoroutine(DelayedBusSignals(_busController.busSegments[1], _busController.busSegments[6], 0, ALU.calculate(srcA.Output, 4, _aluVizualizer.CurrentALUOperation)));
+                yield return StartCoroutine(DelayedBusSignals(busController.busSegments[1], busController.busSegments[6], 0, Alu.Calculate(_srcA.Output, 4, aluVizualizer.CurrentAluOperation)));
             }
 
-            yield return StartCoroutine(DelayedBusSignal(_busController.busSegments[2], srcB.Output));
+            yield return StartCoroutine(DelayedBusSignal(busController.busSegments[2], _srcB.Output));
 
 
-            yield return StartCoroutine(DelayedBusSignal(_busController.busSegments[3], Extender.Evaluate(_extenderVizualizer.CurrentALUOperation, (uint)srcB.Output)));
+            yield return StartCoroutine(DelayedBusSignal(busController.busSegments[3], Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)_srcB.Output)));
 
-            _currentBus++;
+            CurrentBus++;
         }
 
-        yield return new WaitUntil(() => _busController.NoActiveSignals);
+        yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
     protected override IEnumerator ReverseBusVisualizations()
     {
-        if (_currentBus >= 1 && _currentBus <= _maxTickNumber)
+        if (CurrentBus >= 1 && CurrentBus <= maxTickNumber)
         {
-            _busController.StartBusSignal(_busController.busSegments[3], output.Input, true);
+            busController.StartBusSignal(busController.busSegments[3], _output.Input, true);
 
-            if (_tickStateValues[_tickCounter] is LevelFiveState s)
+            if (TickStateValues[TickCounter] is LevelFiveState s)
             {
-                yield return StartCoroutine(DelayedBusSignal(_busController.busSegments[2], s.RegisterInstrValue, true));
+                yield return StartCoroutine(DelayedBusSignal(busController.busSegments[2], s.RegisterInstrValue, true));
 
-                yield return StartCoroutine(DelayedBusSignals(_busController.busSegments[1], _busController.busSegments[6], srcB.Input, srcA.Input, true, true));
+                yield return StartCoroutine(DelayedBusSignals(busController.busSegments[1], busController.busSegments[6], _srcB.Input, _srcA.Input, true, true));
 
-                yield return new WaitUntil(() => _busController.NoActiveSignals);
+                yield return new WaitUntil(() => busController.NoActiveSignals);
 
-                _busController.StartBusSignal(_busController.busSegments[0], srcA.Output, true);
-                _busController.StartBusSignal(_busController.busSegments[4], srcA.Output, true);
-                _busController.StartBusSignal(_busController.busSegments[5], 4, true);
+                busController.StartBusSignal(busController.busSegments[0], _srcA.Output, true);
+                busController.StartBusSignal(busController.busSegments[4], _srcA.Output, true);
+                busController.StartBusSignal(busController.busSegments[5], 4, true);
             }
 
-            _currentBus--;
+            CurrentBus--;
         }
 
-        yield return new WaitUntil(() => _busController.NoActiveSignals);
+        yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
     protected override void HandleClockUpdate() {
         
         // sinchronyse vizualisers and concrete objects
-        srcA.WriteEnable = _registerSrcAVisualizer.isWriteEnabled;
-        srcB.WriteEnable = _registerSrcBVisualizer.isWriteEnabled;
-        output.WriteEnable = _registerOutputVisualizer.isWriteEnabled;
-        dataIntructionMemory.MemoryWrite = _registerOutputVisualizer.isWriteEnabled;
+        _srcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
+        _srcB.WriteEnable = registerSrcBVisualizer.isWriteEnabled;
+        _output.WriteEnable = registerOutputVisualizer.isWriteEnabled;
+        _dataIntructionMemory.MemoryWrite = registerOutputVisualizer.isWriteEnabled;
 
         // implementation
-        if (dataIntructionMemory._memory.ContainsKey(srcA.Output))
+        if (_dataIntructionMemory.Memory.ContainsKey(_srcA.Output))
         {
-            srcB.Input = dataIntructionMemory._memory[srcA.Output];
+            _srcB.Input = _dataIntructionMemory.Memory[_srcA.Output];
         }
         else
         {
-            srcB.Input = 0;
+            _srcB.Input = 0;
             // if(dataIntructionMemory.MemoryWrite)
             //  XXX
         }
 
-        srcA.Input = ALU.calculate(srcA.Output, 4, _aluVizualizer.CurrentALUOperation);
+        _srcA.Input = Alu.Calculate(_srcA.Output, 4, aluVizualizer.CurrentAluOperation);
 
-        output.Input = Extender.Evaluate(_extenderVizualizer.CurrentALUOperation, (uint)srcB.Output);
+        _output.Input = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)_srcB.Output);
 
-        if (_currentBus == 2)
+        if (CurrentBus == 2)
         {
-            dataIntructionMemory.LoadWord(0, output.Output);
+            _dataIntructionMemory.LoadWord(0, _output.Output);
         }
-        else if (_currentBus == 3)
+        else if (CurrentBus == 3)
         {
-            dataIntructionMemory.LoadWord(4, output.Output);
+            _dataIntructionMemory.LoadWord(4, _output.Output);
         }
-        else if (_currentBus == 4)
+        else if (CurrentBus == 4)
         {
-            dataIntructionMemory.LoadWord(8, output.Output);
+            _dataIntructionMemory.LoadWord(8, _output.Output);
         }
-        else if (_currentBus == 5)
+        else if (CurrentBus == 5)
         {
-            dataIntructionMemory.LoadWord(12, output.Output);
+            _dataIntructionMemory.LoadWord(12, _output.Output);
         }
 
 
-        srcA.PreClockUpdate();
-        srcB.PreClockUpdate();
-        output.PreClockUpdate();
-        dataIntructionMemory.PreClockUpdate();
+        _srcA.PreClockUpdate();
+        _srcB.PreClockUpdate();
+        _output.PreClockUpdate();
+        _dataIntructionMemory.PreClockUpdate();
 
 
         
-        srcA.Clock();
-        srcB.Clock();
-        output.Clock();
-        dataIntructionMemory.Clock();
+        _srcA.Clock();
+        _srcB.Clock();
+        _output.Clock();
+        _dataIntructionMemory.Clock();
     }
 
     protected override object GetCurrentState() {
         return new LevelFiveState
         {
-            RegisterPCValue = srcA.Output,
-            RegisterInstrValue = srcB.Output,
-            RegisterOutputValue = output.Output,
+            RegisterPCValue = _srcA.Output,
+            RegisterInstrValue = _srcB.Output,
+            RegisterOutputValue = _output.Output,
 
-            firstMemoryValue = dataIntructionMemory._memory[0],
-            secondMemoryValue = dataIntructionMemory._memory[4],
-            thirdMemoryValue = dataIntructionMemory._memory[8],
-            fourthMemoryValue = dataIntructionMemory._memory[12],
+            FirstMemoryValue = _dataIntructionMemory.Memory[0],
+            SecondMemoryValue = _dataIntructionMemory.Memory[4],
+            ThirdMemoryValue = _dataIntructionMemory.Memory[8],
+            FourthMemoryValue = _dataIntructionMemory.Memory[12],
 
-            RegisterPCWE = srcA.WriteEnable,
-            RegisterInstrWE = srcB.WriteEnable,
-            RegisterOutputWE = output.WriteEnable,
+            RegisterPcwe = _srcA.WriteEnable,
+            RegisterInstrWe = _srcB.WriteEnable,
+            RegisterOutputWe = _output.WriteEnable,
 
 
-            ALUOperation = _aluVizualizer.CurrentALUOperation,
+            AluOperation = aluVizualizer.CurrentAluOperation,
 
-            ExtenderOperation = _extenderVizualizer.CurrentALUOperation,
+            ExtenderOperation = extenderVizualizer.CurrentAluOperation,
 };
     }
 
     protected override void ApplyState(object state)
     {
-        LevelFiveState s = (LevelFiveState)state;
+        var s = (LevelFiveState)state;
 
-        srcA = new Register(s.RegisterPCValue);
-        srcB = new Register(s.RegisterInstrValue);
-        output = new Register(s.RegisterOutputValue);
+        _srcA = new Register(s.RegisterPCValue);
+        _srcB = new Register(s.RegisterInstrValue);
+        _output = new Register(s.RegisterOutputValue);
 
-        dataIntructionMemory = new DataInstMemory();
-        dataIntructionMemory._memory[0] = s.firstMemoryValue;
-        dataIntructionMemory._memory[4] = s.secondMemoryValue;
-        dataIntructionMemory._memory[8] = s.thirdMemoryValue;
-        dataIntructionMemory._memory[12] = s.fourthMemoryValue;
+        _dataIntructionMemory = new DataInstMemory();
+        _dataIntructionMemory.Memory[0] = s.FirstMemoryValue;
+        _dataIntructionMemory.Memory[4] = s.SecondMemoryValue;
+        _dataIntructionMemory.Memory[8] = s.ThirdMemoryValue;
+        _dataIntructionMemory.Memory[12] = s.FourthMemoryValue;
 
-        srcA.WriteEnable = s.RegisterPCWE;
-        srcB.WriteEnable = s.RegisterInstrWE;
-        output.WriteEnable = s.RegisterOutputWE;
+        _srcA.WriteEnable = s.RegisterPcwe;
+        _srcB.WriteEnable = s.RegisterInstrWe;
+        _output.WriteEnable = s.RegisterOutputWe;
 
 
-        _aluVizualizer.ChooseALUOperation(s.ALUOperation);
-        _extenderVizualizer.ChooseALUOperation(s.ExtenderOperation);
+        aluVizualizer.ChooseAluOperation(s.AluOperation);
+        extenderVizualizer.ChooseAluOperation(s.ExtenderOperation);
     }
 
     /*protected override bool IsStateEqual(object state)
@@ -262,65 +264,65 @@ public class LevelFiveRegisseur : BaseLevelRegisseur
 
     protected override void BlinkClockedComponents()
     {
-        _registerSrcAVisualizer.TriggerBlink();
-        _registerSrcBVisualizer.TriggerBlink();
-        _registerOutputVisualizer.TriggerBlink();
-        _memoryVisualizer.TriggerBlink();
-        _blinkerNumber.Trigger();
+        registerSrcAVisualizer.TriggerBlink();
+        registerSrcBVisualizer.TriggerBlink();
+        registerOutputVisualizer.TriggerBlink();
+        memoryVisualizer.TriggerBlink();
+        blinkerNumber.Trigger();
     }
 
     protected override void BlockIngameInteractables()
     {
-        _registerSrcAVisualizer.UIRegisterPanel.WEButton.interactable = false;
-        _registerSrcBVisualizer.UIRegisterPanel.WEButton.interactable = false;
-        _registerOutputVisualizer.UIRegisterPanel.WEButton.interactable = false;
-        _memoryVisualizer.UIRegisterPanel.WEButton.interactable = false;
+        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
+        registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = false;
+        registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = false;
+        memoryVisualizer.UIRegisterPanel.WeButton.interactable = false;
 
-        _aluVizualizer.UIController.FirstOperationButton.interactable = false;
-        _aluVizualizer.UIController.SecondOperationButton.interactable = false;
-        _aluVizualizer.UIController.ThirdOperationButton.interactable = false;
-        _aluVizualizer.UIController.FourthOperationButton.interactable = false;
+        aluVizualizer.uiController.FirstOperationButton.interactable = false;
+        aluVizualizer.uiController.SecondOperationButton.interactable = false;
+        aluVizualizer.uiController.ThirdOperationButton.interactable = false;
+        aluVizualizer.uiController.FourthOperationButton.interactable = false;
 
-        _extenderVizualizer.UIController.FirstOperationButton.interactable = false;
-        _extenderVizualizer.UIController.SecondOperationButton.interactable = false;
-        _extenderVizualizer.UIController.ThirdOperationButton.interactable = false;
-        _extenderVizualizer.UIController.FourthOperationButton.interactable = false;
+        extenderVizualizer.uiController.FirstOperationButton.interactable = false;
+        extenderVizualizer.uiController.SecondOperationButton.interactable = false;
+        extenderVizualizer.uiController.ThirdOperationButton.interactable = false;
+        extenderVizualizer.uiController.FourthOperationButton.interactable = false;
     }
 
     protected override void ReleaseIngameInteractables()
     {
-        _registerSrcAVisualizer.UIRegisterPanel.WEButton.interactable = true;
-        _registerSrcBVisualizer.UIRegisterPanel.WEButton.interactable = true;
-        _registerOutputVisualizer.UIRegisterPanel.WEButton.interactable = true;
-        _memoryVisualizer.UIRegisterPanel.WEButton.interactable = true;
+        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
+        registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = true;
+        registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = true;
+        memoryVisualizer.UIRegisterPanel.WeButton.interactable = true;
 
-        _aluVizualizer.UIController.FirstOperationButton.interactable = true;
-        _aluVizualizer.UIController.SecondOperationButton.interactable = true;
-        _aluVizualizer.UIController.ThirdOperationButton.interactable = true;
-        _aluVizualizer.UIController.FourthOperationButton.interactable = true;
+        aluVizualizer.uiController.FirstOperationButton.interactable = true;
+        aluVizualizer.uiController.SecondOperationButton.interactable = true;
+        aluVizualizer.uiController.ThirdOperationButton.interactable = true;
+        aluVizualizer.uiController.FourthOperationButton.interactable = true;
 
-        _extenderVizualizer.UIController.FirstOperationButton.interactable = true;
-        _extenderVizualizer.UIController.SecondOperationButton.interactable = true;
-        _extenderVizualizer.UIController.ThirdOperationButton.interactable = true;
-        _extenderVizualizer.UIController.FourthOperationButton.interactable = true;
+        extenderVizualizer.uiController.FirstOperationButton.interactable = true;
+        extenderVizualizer.uiController.SecondOperationButton.interactable = true;
+        extenderVizualizer.uiController.ThirdOperationButton.interactable = true;
+        extenderVizualizer.uiController.FourthOperationButton.interactable = true;
     }
 
     protected override bool CheckWinCondition()
     {
-        if (_tickStateValues == null 
-            || _tickStateValues[4] == null
-            || _tickStateValues[2] == null
-            || _tickStateValues[3] == null) 
+        if (TickStateValues == null 
+            || TickStateValues[4] == null
+            || TickStateValues[2] == null
+            || TickStateValues[3] == null) 
         { return false; }
 
-        if (!(_tickStateValues[4] is LevelFiveState s3)) return false;
-        if (!(_tickStateValues[2] is LevelFiveState s1)) return false;
-        if (!(_tickStateValues[3] is LevelFiveState s2)) return false;
+        if (!(TickStateValues[4] is LevelFiveState s3)) return false;
+        if (!(TickStateValues[2] is LevelFiveState s1)) return false;
+        if (!(TickStateValues[3] is LevelFiveState s2)) return false;
 
-        uint val1 = (uint)s1.RegisterOutputValue;
-        uint val2 = (uint)s2.RegisterOutputValue;
-        uint val3 = (uint)s3.RegisterOutputValue;
-        uint val4 = (uint)output.Output;
+        var val1 = (uint)s1.RegisterOutputValue;
+        var val2 = (uint)s2.RegisterOutputValue;
+        var val3 = (uint)s3.RegisterOutputValue;
+        var val4 = (uint)_output.Output;
 
         if (val1 != 1000 ||
             val2 != 8 ||
@@ -335,66 +337,66 @@ public class LevelFiveRegisseur : BaseLevelRegisseur
 
     protected override void UpdateVizualizers()
     {
-        _infoSrcARegister.Display("Register 1", $"{srcA.Output}");
-        _infoSrcBRegister.Display("Register 2", commandBuilder((uint)srcB.Output));
-        _infoOutputRegister.Display("Register 3", $"{output.Output}");
-        _registerSrcAVisualizer.ForceUpdateWriteEnableVisualization(srcA.WriteEnable);
-        _registerSrcBVisualizer.ForceUpdateWriteEnableVisualization(srcB.WriteEnable);
-        _registerOutputVisualizer.ForceUpdateWriteEnableVisualization(output.WriteEnable);
+        _infoSrcARegister.Display("Register 1", $"{_srcA.Output}");
+        _infoSrcBRegister.Display("Register 2", CommandBuilder((uint)_srcB.Output));
+        _infoOutputRegister.Display("Register 3", $"{_output.Output}");
+        registerSrcAVisualizer.ForceUpdateWriteEnableVisualization(_srcA.WriteEnable);
+        registerSrcBVisualizer.ForceUpdateWriteEnableVisualization(_srcB.WriteEnable);
+        registerOutputVisualizer.ForceUpdateWriteEnableVisualization(_output.WriteEnable);
 
         
-        _memoryVisualizer.UIRegisterPanel.Display(
-            commandBuilder((uint)dataIntructionMemory._memory[0]),
-            commandBuilder((uint)dataIntructionMemory._memory[4]),
-            commandBuilder((uint)dataIntructionMemory._memory[8]),
-            commandBuilder((uint)dataIntructionMemory._memory[12])
+        memoryVisualizer.UIRegisterPanel.Display(
+            CommandBuilder((uint)_dataIntructionMemory.Memory[0]),
+            CommandBuilder((uint)_dataIntructionMemory.Memory[4]),
+            CommandBuilder((uint)_dataIntructionMemory.Memory[8]),
+            CommandBuilder((uint)_dataIntructionMemory.Memory[12])
         );
-        _memoryVisualizer.ForceUpdateWriteEnableVisualization (dataIntructionMemory.MemoryWrite);
+        memoryVisualizer.ForceUpdateWriteEnableVisualization (_dataIntructionMemory.MemoryWrite);
     }
 
     #region helpers
     protected IEnumerator DelayedBusSignal(LineRenderer busToStart, bool reverse = false)
     {
-        yield return new WaitUntil(() => _busController.NoActiveSignals);
+        yield return new WaitUntil(() => busController.NoActiveSignals);
 
         // We're sending the third signal
-        _busController.StartBusSignal(busToStart, reverse);
+        busController.StartBusSignal(busToStart, reverse);
     }
     protected IEnumerator DelayedBusSignal(LineRenderer busToStart, int value, bool reverse = false)
     {
-        yield return new WaitUntil(() => _busController.NoActiveSignals);
+        yield return new WaitUntil(() => busController.NoActiveSignals);
 
         // We're sending the third signal
-        _busController.StartBusSignal(busToStart, value, reverse);
+        busController.StartBusSignal(busToStart, value, reverse);
     }
 
     protected IEnumerator DelayedBusSignals(LineRenderer firstBusToStart, LineRenderer secondBusToStart)
     {
-        yield return new WaitUntil(() => _busController.NoActiveSignals);
+        yield return new WaitUntil(() => busController.NoActiveSignals);
 
-        _busController.StartBusSignal(firstBusToStart);
-        _busController.StartBusSignal(secondBusToStart);
+        busController.StartBusSignal(firstBusToStart);
+        busController.StartBusSignal(secondBusToStart);
     }
     protected IEnumerator DelayedBusSignals(LineRenderer firstBusToStart, LineRenderer secondBusToStart, bool firstReverse, bool secondReverse)
     {
-        yield return new WaitUntil(() => _busController.NoActiveSignals);
+        yield return new WaitUntil(() => busController.NoActiveSignals);
 
-        _busController.StartBusSignal(firstBusToStart, firstReverse);
-        _busController.StartBusSignal(secondBusToStart, secondReverse);
+        busController.StartBusSignal(firstBusToStart, firstReverse);
+        busController.StartBusSignal(secondBusToStart, secondReverse);
     }
     protected IEnumerator DelayedBusSignals(LineRenderer firstBusToStart, LineRenderer secondBusToStart, int val1, int val2)
     {
-        yield return new WaitUntil(() => _busController.NoActiveSignals);
+        yield return new WaitUntil(() => busController.NoActiveSignals);
 
-        _busController.StartBusSignal(firstBusToStart, val1);
-        _busController.StartBusSignal(secondBusToStart, val2);
+        busController.StartBusSignal(firstBusToStart, val1);
+        busController.StartBusSignal(secondBusToStart, val2);
     }
     protected IEnumerator DelayedBusSignals(LineRenderer firstBusToStart, LineRenderer secondBusToStart, int val1, int val2, bool firstReverse, bool secondReverse)
     {
-        yield return new WaitUntil(() => _busController.NoActiveSignals);
+        yield return new WaitUntil(() => busController.NoActiveSignals);
 
-        _busController.StartBusSignal(firstBusToStart, val1, firstReverse);
-        _busController.StartBusSignal(secondBusToStart, val2, secondReverse);
+        busController.StartBusSignal(firstBusToStart, val1, firstReverse);
+        busController.StartBusSignal(secondBusToStart, val2, secondReverse);
     }
     #endregion
 }

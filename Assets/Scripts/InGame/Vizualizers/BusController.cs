@@ -18,11 +18,11 @@ public class BusController : MonoBehaviour
     public LineRenderer[] busSegments;
 
     // A dictionary to store the path for each bus so it doesn't have to be calculated every time
-    private Dictionary<LineRenderer, Vector3[]> busPaths = new Dictionary<LineRenderer, Vector3[]>();
-    private Dictionary<LineRenderer, Vector3[]> reverseBusPaths = new Dictionary<LineRenderer, Vector3[]>();
+    private Dictionary<LineRenderer, Vector3[]> _busPaths = new Dictionary<LineRenderer, Vector3[]>();
+    private Dictionary<LineRenderer, Vector3[]> _reverseBusPaths = new Dictionary<LineRenderer, Vector3[]>();
 
-    private List<BusSignal> activeSignals = new List<BusSignal>();
-    public bool NoActiveSignals => activeSignals.Count == 0;
+    private List<BusSignal> _activeSignals = new List<BusSignal>();
+    public bool NoActiveSignals => _activeSignals.Count == 0;
 
     void Start()
     {
@@ -39,7 +39,7 @@ public class BusController : MonoBehaviour
             Debug.LogError("Slider is null !");
         }
 
-        Debug.Log($"The controller has loaded {busPaths.Count} bus segments.");
+        Debug.Log($"The controller has loaded {_busPaths.Count} bus segments.");
     }
 
     /// <summary>
@@ -49,22 +49,22 @@ public class BusController : MonoBehaviour
     /// <param name="targetBus">LineRenderer, through which the signal should be sent.</param>
     public void StartBusSignal(LineRenderer targetBus, bool reversedPath = false)
     {
-        Vector3[] pathPoints = GetPathPoints(targetBus, reversedPath);
+        var pathPoints = GetPathPoints(targetBus, reversedPath);
         if (pathPoints == null || pathPoints.Length < 2) return;
 
         // Create a sphere
-        GameObject currentSphere = Instantiate(spherePrefab);
+        var currentSphere = Instantiate(spherePrefab);
         currentSphere.SetActive(true);
         
         currentSphere.transform.position = pathPoints[0];
 
         // Retrieving the BusSignal component
-        BusSignal signal = currentSphere.GetComponent<BusSignal>();
+        var signal = currentSphere.GetComponent<BusSignal>();
         
         // 2. Important: Adjust the speed and add it to the monitoring list
         if (signal != null)
         {
-            activeSignals.Add(signal);
+            _activeSignals.Add(signal);
         }
 
         StartCoroutine(MoveSphereAlongPath(signal, pathPoints));
@@ -72,23 +72,23 @@ public class BusController : MonoBehaviour
 
     public void StartBusSignal(LineRenderer targetBus, int value, bool reversedPath = false)
     {
-        Vector3[] pathPoints = GetPathPoints(targetBus, reversedPath);
+        var pathPoints = GetPathPoints(targetBus, reversedPath);
         if (pathPoints == null || pathPoints.Length < 2) return;
 
         // Create a sphere
-        GameObject currentSphere = Instantiate(spherePrefab);
+        var currentSphere = Instantiate(spherePrefab);
         currentSphere.SetActive(true);
 
         currentSphere.transform.position = pathPoints[0];
 
         // Retrieving the BusSignal component
-        BusSignal signal = currentSphere.GetComponent<BusSignal>();
+        var signal = currentSphere.GetComponent<BusSignal>();
         signal.UIRegisterPanel.Display("Signal", $"{value}");
 
         // 2. Important: Adjust the speed and add it to the monitoring list
         if (signal != null)
         {
-            activeSignals.Add(signal);
+            _activeSignals.Add(signal);
         }
 
         StartCoroutine(MoveSphereAlongPath(signal, pathPoints));
@@ -99,15 +99,15 @@ public class BusController : MonoBehaviour
     {
         if (signal == null) yield break;
 
-        for (int i = 1; i < pathPoints.Length; i++)
+        for (var i = 1; i < pathPoints.Length; i++)
         {
-            Vector3 startPoint = pathPoints[i - 1];
-            Vector3 targetPoint = pathPoints[i];
+            var startPoint = pathPoints[i - 1];
+            var targetPoint = pathPoints[i];
 
             while (signal.transform.position != targetPoint)
             {
                 // Take the current speed (normal or fast-forward)
-                float currentSpeed = movementSpeed;
+                var currentSpeed = movementSpeed;
 
                 signal.transform.position = Vector3.MoveTowards(
                     signal.transform.position,
@@ -119,7 +119,7 @@ public class BusController : MonoBehaviour
         }
 
         // 4. Remove from the list before destruction
-        activeSignals.Remove(signal);
+        _activeSignals.Remove(signal);
         Destroy(signal.UIRegisterPanel.gameObject);
         Destroy(signal.gameObject);
     }
@@ -131,7 +131,7 @@ public class BusController : MonoBehaviour
     }
 
     private void InitializePaths() {
-        foreach (LineRenderer lr in busSegments)
+        foreach (var lr in busSegments)
         {
             // Check for null (if there are empty slots in the inspector)
             if (lr == null)
@@ -141,9 +141,9 @@ public class BusController : MonoBehaviour
             }
 
             // The transform relative to which the LineRenderer stores its points
-            Transform busTransform = lr.transform;
+            var busTransform = lr.transform;
 
-            int pointCount = lr.positionCount;
+            var pointCount = lr.positionCount;
             if (pointCount < 2)
             {
                 Debug.LogWarning($"The '{lr.gameObject.name}' bus has fewer than 2 vertices and will not be loaded.");
@@ -151,16 +151,16 @@ public class BusController : MonoBehaviour
             }
 
             // Retrieve local coordinates from the LineRenderer
-            Vector3[] localPoints = new Vector3[pointCount];
+            var localPoints = new Vector3[pointCount];
             lr.GetPositions(localPoints);
 
             // Arrays for storing paths in world space
-            Vector3[] worldPoints = new Vector3[pointCount];
-            Vector3[] reversedWorldPoints = new Vector3[pointCount];
+            var worldPoints = new Vector3[pointCount];
+            var reversedWorldPoints = new Vector3[pointCount];
 
             // --- 2. CONVERSION OF LOCAL POINTS TO WORLD COORDINATES ---
 
-            for (int i = 0; i < pointCount; i++)
+            for (var i = 0; i < pointCount; i++)
             {
                 // We use TransformPoint to convert the local position (localPoints[i])
                 // to a global (world) position, taking into account the position and rotation of the bus's parent (busTransform).
@@ -170,7 +170,7 @@ public class BusController : MonoBehaviour
             // --- 3. SAVING THE STRAIGHT PATH ---
 
             // We store an array of world coordinates for forward motion
-            busPaths.Add(lr, worldPoints);
+            _busPaths.Add(lr, worldPoints);
 
             // --- 4. SAVING THE RETURN PATH (REVERSE) ---
 
@@ -181,14 +181,14 @@ public class BusController : MonoBehaviour
             System.Array.Reverse(reversedWorldPoints);
 
             // We store an array of inverse global coordinates
-            reverseBusPaths.Add(lr, reversedWorldPoints);
+            _reverseBusPaths.Add(lr, reversedWorldPoints);
         }
     }
 
     private Vector3[] GetPathPoints(LineRenderer targetBus, bool reversed)
     {
         if (targetBus == null) return null;
-        var dict = reversed ? reverseBusPaths : busPaths;
+        var dict = reversed ? _reverseBusPaths : _busPaths;
         return dict.ContainsKey(targetBus) ? dict[targetBus] : null;
     }
 }

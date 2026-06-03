@@ -1,52 +1,53 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.Serialization;
 
-public class ALUVizualiser : BaseVizualizer
+public class AluVizualiser : BaseVizualizer
 {
+    [FormerlySerializedAs("_operationBanner")]
     [Header("Operations Renderers (Optional 3D Text/Objects)")]
-    [SerializeField] protected GameObject _operationBanner;
-    [SerializeField] protected TMP_Text _symbolForOperation;
+    [SerializeField] protected GameObject operationBanner;
+    [FormerlySerializedAs("_symbolForOperation")] [SerializeField] protected TMP_Text symbolForOperation;
 
-    protected ALUControlPanel _uiController;
-    public ALUControlPanel UIController => _uiController;
+    [FormerlySerializedAs("_uiController")] public AluControlPanel uiController;
 
-    protected int _operation;
-    public int CurrentALUOperation => _operation;
+    protected int Operation;
+    public int CurrentAluOperation => Operation;
 
 
     protected override void Awake()
     {
         base.Awake();
 
-        if (_uiController != null)
+        if (uiController != null)
         {
-            _uiController.Setup("ALU");
+            uiController.Setup("ALU");
         }
 
-        _uiController.FirstOperationButton.onClick.AddListener(() => ChooseALUOperation(0));
-        _uiController.SecondOperationButton.onClick.AddListener(() => ChooseALUOperation(1));
-        _uiController.ThirdOperationButton.onClick.AddListener(() => ChooseALUOperation(2));
-        _uiController.FourthOperationButton.onClick.AddListener(() => ChooseALUOperation(3));
+        uiController.FirstOperationButton.onClick.AddListener(() => ChooseAluOperation(0));
+        uiController.SecondOperationButton.onClick.AddListener(() => ChooseAluOperation(1));
+        uiController.ThirdOperationButton.onClick.AddListener(() => ChooseAluOperation(2));
+        uiController.FourthOperationButton.onClick.AddListener(() => ChooseAluOperation(3));
 
         ResetVizualization();
     }
     protected override void InitializePanelController()
     {
         // Controller initialization specific to this class
-        _uiController = _panelInstance.GetComponent<ALUControlPanel>();
-        if (_uiController == null)
+        uiController = panelInstance.GetComponent<AluControlPanel>();
+        if (uiController == null)
         {
             Debug.LogError($"ALUControlPanel component not found on the prefab for {gameObject.name}!");
         }
     }
 
     public override void ResetVizualization(){
-        if (_operationBanner.activeSelf) {
-            _operationBanner.SetActive(false);
+        if (operationBanner.activeSelf) {
+            operationBanner.SetActive(false);
         }
     }
 
-    public void ChooseALUOperation(int operation)
+    public void ChooseAluOperation(int operation)
     {
         HideData();
         string symbol;
@@ -70,11 +71,11 @@ public class ALUVizualiser : BaseVizualizer
                 break;
         }
 
-        _symbolForOperation.text = symbol;
-        _operation = operation;
+        symbolForOperation.text = symbol;
+        Operation = operation;
 
-        if (!_operationBanner.activeSelf) {
-            _operationBanner.SetActive(true);
+        if (!operationBanner.activeSelf) {
+            operationBanner.SetActive(true);
         }
     }
 }

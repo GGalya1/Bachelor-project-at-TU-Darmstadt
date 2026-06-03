@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class InstrMemoryControlPanel: InfoPanelUI
 {
-    [SerializeField] private Button _weButton;
-    public Button WEButton => _weButton;
+    [FormerlySerializedAs("_weButton")] [SerializeField] private Button weButton;
+    public Button WeButton => weButton;
 
     public TextMeshProUGUI firstAddresValue;
     public TextMeshProUGUI secondAddresValue;

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Orchestrates the dialogue flow by connecting data (DialogueGraph) with the interface (DialogueUI).
@@ -7,10 +8,11 @@ using UnityEngine;
 /// </summary>
 public class DialogueManager : MonoBehaviour 
 {
+    [FormerlySerializedAs("_ui")]
     [Header("References")]
-    [SerializeField] private DialogueUI _ui;
-    [SerializeField] private DialogueGraph _activeGraph;
-    [SerializeField] private DialogueGraph _hintGraph;
+    [SerializeField] private DialogueUI ui;
+    [FormerlySerializedAs("_activeGraph")] [SerializeField] private DialogueGraph activeGraph;
+    [FormerlySerializedAs("_hintGraph")] [SerializeField] private DialogueGraph hintGraph;
 
     public event Action OnDialogueEnd;
     public event Action OnDialogueBegin;
@@ -22,27 +24,27 @@ public class DialogueManager : MonoBehaviour
     public void Start()
     {
         // Automatically start the dialogue if a graph is assigned
-        if (_activeGraph != null)
+        if (activeGraph != null)
         {
-            StartDialogue(_activeGraph);
+            StartDialogue(activeGraph);
         }
     
 
         // Subscribe to UI events
-        _ui.OnNextRequested += HandleNextQuote;
-        _ui.OnSpecificPathRequested += HandleBranching;
+        ui.OnNextRequested += HandleNextQuote;
+        ui.OnSpecificPathRequested += HandleBranching;
     }
     
     /// <summary>
     /// Switches the active conversation to the hint graph.
     /// </summary>
     public void SetupHintDialogue() {
-        if (_hintGraph == null) return;
+        if (hintGraph == null) return;
 
         _currentNodeIndex = 0;
 
         OnHintEnabled?.Invoke();
-        StartDialogue(_hintGraph);
+        StartDialogue(hintGraph);
     }
 
     /// <summary>
@@ -52,7 +54,7 @@ public class DialogueManager : MonoBehaviour
     {
         _currentNodeIndex++;
 
-        if (_currentNodeIndex < _activeGraph.Nodes.Count)
+        if (_currentNodeIndex < activeGraph.nodes.Count)
         {
             SetNode(_currentNodeIndex);
 
@@ -69,7 +71,7 @@ public class DialogueManager : MonoBehaviour
     /// <param name="branchIndex">The ID of the chosen answer (1, 2, or 3).</param>
     private void HandleBranching(int branchIndex)
     {
-        int targetIndex = -1;
+        var targetIndex = -1;
 
         if (branchIndex == 1)
         {
@@ -90,7 +92,7 @@ public class DialogueManager : MonoBehaviour
         }
 
         // Check if the target node exists in the graph
-        if (targetIndex >= 0 && targetIndex < _activeGraph.Nodes.Count)
+        if (targetIndex >= 0 && targetIndex < activeGraph.nodes.Count)
         {
             SetNode(targetIndex);
         }
@@ -108,13 +110,13 @@ public class DialogueManager : MonoBehaviour
     /// </summary>
     private void StartDialogue(DialogueGraph graph)
     {
-        if (graph == null || graph.Nodes == null || graph.Nodes.Count == 0)
+        if (graph == null || graph.nodes == null || graph.nodes.Count == 0)
         {
             Debug.LogError($"[DialogueManager] Cannot start dialogue: Graph is null or empty!");
             return;
         }
 
-        _activeGraph = graph;
+        activeGraph = graph;
         OnDialogueBegin?.Invoke();
         SetNode(0);
     }
@@ -124,28 +126,28 @@ public class DialogueManager : MonoBehaviour
     private void SetNode(int index)
     {
         _currentNodeIndex = index;
-        _currentNode = _activeGraph.Nodes[_currentNodeIndex];
-        _ui.UpdateVisuals(_currentNode);
+        _currentNode = activeGraph.nodes[_currentNodeIndex];
+        ui.UpdateVisuals(_currentNode);
     }
     private void EndDialogue()
     {
         Debug.Log("[DialogueManager] Dialogue sequence finished.");
         OnDialogueEnd?.Invoke();
-        _ui.StopAnimatingText();
+        ui.StopAnimatingText();
     }
 
     public void SetActiveGraph(DialogueGraph g) {
-        _activeGraph = g;
+        activeGraph = g;
     }
     #endregion
 
 
     private void OnDestroy()
     {
-        if (_ui != null) 
+        if (ui != null) 
         {
-            _ui.OnNextRequested -= HandleNextQuote;
-            _ui.OnSpecificPathRequested -= HandleBranching;
+            ui.OnNextRequested -= HandleNextQuote;
+            ui.OnSpecificPathRequested -= HandleBranching;
         }
     }
 }

@@ -8,7 +8,7 @@ public class ClickableObject: MonoBehaviour, IPointerClickHandler
     {
 
         // get the IVizualizer from an object
-        IVizualizer vizualizer = GetComponent<IVizualizer>();
+        var vizualizer = GetComponent<IVizualizer>();
 
         if (vizualizer != null)
         {

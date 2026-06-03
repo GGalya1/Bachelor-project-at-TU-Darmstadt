@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Component for visualizing a digital Register unit within a 3D scene.
@@ -18,13 +19,15 @@ public class RegisterVizualizer: BaseVizualizer
     private RegisterControlPanel _uiController;
     public RegisterControlPanel UIRegisterPanel => _uiController;
 
+    [FormerlySerializedAs("_writeEnableIndicator")]
     [Header("Write Enable Visualization")]
     [Tooltip("Object that controls WE-signal and Stop-image")]
-    [SerializeField] private GameObject _writeEnableIndicator;
+    [SerializeField] private GameObject writeEnableIndicator;
     public bool isWriteEnabled;
 
+    [FormerlySerializedAs("_blinker")]
     [Header("Blinker of sequential component")]
-    [SerializeField] private Blinker _blinker;
+    [SerializeField] private Blinker blinker;
 
     protected override void Awake() {
         base.Awake();
@@ -36,30 +39,30 @@ public class RegisterVizualizer: BaseVizualizer
         }
 
         // Set the initial state for STOP indicator
-        if (_writeEnableIndicator != null)
+        if (writeEnableIndicator != null)
         {
-            _writeEnableIndicator.SetActive(false);
+            writeEnableIndicator.SetActive(false);
             isWriteEnabled = true;
-            _uiController.WEButton.onClick.AddListener(SwitchWriteEnableVisualization);
+            _uiController.WeButton.onClick.AddListener(SwitchWriteEnableVisualization);
         }
     }
     public void SwitchWriteEnableVisualization()
     {
-        if (_writeEnableIndicator != null)
+        if (writeEnableIndicator != null)
         {
             // if WE is true -> indicator must be inactive
             // if WE is false -> indicator must be active
             isWriteEnabled = !isWriteEnabled;
-            _writeEnableIndicator.SetActive(!isWriteEnabled);
+            writeEnableIndicator.SetActive(!isWriteEnabled);
             HideData();
 
         }
     }
     public void ForceUpdateWriteEnableVisualization(bool flag) {
-        if (_writeEnableIndicator != null)
+        if (writeEnableIndicator != null)
         {
             isWriteEnabled = flag;
-            _writeEnableIndicator.SetActive(!isWriteEnabled);
+            writeEnableIndicator.SetActive(!isWriteEnabled);
         }
     }
 
@@ -69,7 +72,7 @@ public class RegisterVizualizer: BaseVizualizer
     /// </summary>
     protected override void InitializePanelController()
     {
-        _uiController = _panelInstance.GetComponent<RegisterControlPanel>();
+        _uiController = panelInstance.GetComponent<RegisterControlPanel>();
         if (_uiController == null)
         {
             Debug.LogError($"InfoPanelUI component not found on the prefab for {gameObject.name}!");
@@ -78,7 +81,7 @@ public class RegisterVizualizer: BaseVizualizer
 
     public void TriggerBlink()
     {
-        _blinker.Trigger();
+        blinker.Trigger();
     }
 
     public override void ResetVizualization() { }
