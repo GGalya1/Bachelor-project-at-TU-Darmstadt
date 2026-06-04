@@ -13,7 +13,7 @@ public struct LevelTwoExtendedState
     public int AluOperation;
 }
 
-public class LevelTwoExtended : BaseLevelRegisseur
+public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
 {
     [FormerlySerializedAs("_aluVizualizer")]
     [Header("Level 2 (Extender) Specific Components")]
@@ -39,9 +39,18 @@ public class LevelTwoExtended : BaseLevelRegisseur
 
     protected override void OnLevelStart()
     {
-        _srcA = new Register(srcAValue); _srcA.WriteEnable = true;
-        _srcB = new Register(srcBValue); _srcB.WriteEnable = true;
-        _output = new Register(0); _output.WriteEnable = true;
+        _srcA = new Register(srcAValue)
+        {
+            WriteEnable = true
+        };
+        _srcB = new Register(srcBValue)
+        {
+            WriteEnable = true
+        };
+        _output = new Register(0)
+        {
+            WriteEnable = true
+        };
 
         _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
         _infoSrcBRegister = registerSrcBVisualizer.UIRegisterPanel;
@@ -50,18 +59,22 @@ public class LevelTwoExtended : BaseLevelRegisseur
         UpdateVizualizers();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(LevelTwoExtendedState s)
     {
-        var s = (LevelTwoExtendedState)state;
+        _srcA = new Register(s.RegisterAValue)
+        {
+            WriteEnable = s.RegisterAwe
+        };
 
-        _srcA = new Register(s.RegisterAValue);
-        _srcA.WriteEnable = s.RegisterAwe;
+        _srcB = new Register(s.RegisterBValue)
+        {
+            WriteEnable = s.RegisterBwe
+        };
 
-        _srcB = new Register(s.RegisterBValue);
-        _srcB.WriteEnable = s.RegisterBwe;
-
-        _output = new Register(s.OutputValue);
-        _output.WriteEnable = s.OutputWe;
+        _output = new Register(s.OutputValue)
+        {
+            WriteEnable = s.OutputWe
+        };
 
         aluVizualizer.ChooseAluOperation(s.AluOperation);
     }
@@ -90,7 +103,7 @@ public class LevelTwoExtended : BaseLevelRegisseur
         return (_output.Output == RightAnswerValue);
     }
 
-    protected override object GetCurrentState()
+    protected override LevelTwoExtendedState GetCurrentState()
     {
         return new LevelTwoExtendedState
         {

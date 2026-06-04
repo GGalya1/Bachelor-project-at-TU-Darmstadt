@@ -12,7 +12,7 @@ public struct ExtendedFirstLevelState
     public int MuXoutput;
 }
 
-public class LevelOneExtended : BaseLevelRegisseur
+public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
 {
     [FormerlySerializedAs("_registerOutputVisualizer")]
     [Header("MUXes specific components")]
@@ -34,17 +34,17 @@ public class LevelOneExtended : BaseLevelRegisseur
     protected override void OnLevelStart()
     {
         _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
-        _output = new Register(11); _output.WriteEnable = true;
+        _output = new Register(11)
+        {
+            WriteEnable = true
+        };
 
         UpdateVizualizers();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(ExtendedFirstLevelState s) // "s" for state
     {
-        var s = (ExtendedFirstLevelState)state;
-
         _output = new Register(s.RegisterOutputValue);
-
         
         ApplyMuxState(s.MuXup, upperMuxVisualizer);
         ApplyMuxState(s.MuXmiddle, middleMuxVisualizer);
@@ -74,7 +74,7 @@ public class LevelOneExtended : BaseLevelRegisseur
         return _output.Output == RightAnswerValue;
     }
 
-    protected override object GetCurrentState()
+    protected override ExtendedFirstLevelState GetCurrentState()
     {
         return new ExtendedFirstLevelState
         {

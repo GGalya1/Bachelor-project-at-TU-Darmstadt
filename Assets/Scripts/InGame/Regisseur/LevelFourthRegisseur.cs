@@ -6,9 +6,18 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
     protected override void OnLevelStart()
     {
         // Initialization of logical components
-        SrcA = new Register(0); SrcA.WriteEnable = true;
-        SrcB = new Register(8); SrcB.WriteEnable = true;
-        DataIntructionMemory = new DataInstMemory(); DataIntructionMemory.MemoryWrite = true;
+        SrcA = new Register(0)
+        {
+            WriteEnable = true
+        };
+        SrcB = new Register(8)
+        {
+            WriteEnable = true
+        };
+        DataIntructionMemory = new DataInstMemory
+        {
+            MemoryWrite = true
+        };
         DataIntructionMemory.LoadWord(0, 0);
         DataIntructionMemory.LoadWord(4, 3);
         DataIntructionMemory.LoadWord(8, -256);

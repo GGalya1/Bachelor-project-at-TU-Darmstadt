@@ -13,7 +13,7 @@ public struct LevelZeroState
     public bool OutputRegisterWe;
 }
 
-public class LevelZeroRegisseur : BaseLevelRegisseur
+public class LevelZeroRegisseur : BaseLevelRegisseur<LevelZeroState>
 {
     [FormerlySerializedAs("_registerSrcAVisualizer")]
     [Header("Level 0 Specific Components")]
@@ -41,9 +41,18 @@ public class LevelZeroRegisseur : BaseLevelRegisseur
 
     protected override void OnLevelStart()
     {
-        _srcA = new Register(srcAValue); _srcA.WriteEnable = true;
-        _srcB = new Register(srcBValue); _srcB.WriteEnable = true;
-        _output = new Register(); _output.WriteEnable = true;
+        _srcA = new Register(srcAValue)
+        {
+            WriteEnable = true
+        };
+        _srcB = new Register(srcBValue)
+        {
+            WriteEnable = true
+        };
+        _output = new Register
+        {
+            WriteEnable = true
+        };
 
         // Caching of UI panels for visualizers
         _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
@@ -53,10 +62,8 @@ public class LevelZeroRegisseur : BaseLevelRegisseur
         UpdateVizualizers();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(LevelZeroState s)
     {
-        var s = (LevelZeroState)state;
-
         _srcA = new Register(s.RegisterAValue);
         _srcB = new Register(s.RegisterBValue);
         _output = new Register(s.OutputRegisterValue);
@@ -77,7 +84,7 @@ public class LevelZeroRegisseur : BaseLevelRegisseur
         return (_output.Output == RightAnswerValue);
     }
 
-    protected override object GetCurrentState()
+    protected override LevelZeroState GetCurrentState()
     {
         return new LevelZeroState
         {

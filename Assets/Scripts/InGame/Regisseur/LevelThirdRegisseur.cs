@@ -20,7 +20,7 @@ public struct LevelThreeState
     public int AluOperation;
 }
 
-public class LevelThirdRegisseur : BaseLevelRegisseur
+public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
 {
     [FormerlySerializedAs("_multiplexerVisualizer")]
     [Header("Level 3 Specific Components")]
@@ -54,9 +54,18 @@ public class LevelThirdRegisseur : BaseLevelRegisseur
     protected override void OnLevelStart()
     {
         // Initialization of logical components
-        SrcA = new Register(srcAValue); SrcA.WriteEnable = true;
-        SrcB = new Register(srcBValue); SrcB.WriteEnable = true;
-        DataIntructionMemory = new DataInstMemory(); DataIntructionMemory.MemoryWrite = true;
+        SrcA = new Register(srcAValue)
+        {
+            WriteEnable = true
+        };
+        SrcB = new Register(srcBValue)
+        {
+            WriteEnable = true
+        };
+        DataIntructionMemory = new DataInstMemory
+        {
+            MemoryWrite = true
+        };
         DataIntructionMemory.LoadWord(0, 256);
         DataIntructionMemory.LoadWord(4, 128);
         DataIntructionMemory.LoadWord(8, -89);
@@ -71,17 +80,20 @@ public class LevelThirdRegisseur : BaseLevelRegisseur
         UpdateVizualizers();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(LevelThreeState s)
     {
-        var s = (LevelThreeState)state;
-
         SrcA = new Register(s.RegisterPCValue);
         SrcB = new Register(s.RegisterInstrValue);
-        DataIntructionMemory = new DataInstMemory();
-        DataIntructionMemory.Memory[0] = s.FirstMemoryValue;
-        DataIntructionMemory.Memory[4] = s.SecondMemoryValue;
-        DataIntructionMemory.Memory[8] = s.ThirdMemoryValue;
-        DataIntructionMemory.Memory[12] = s.FourthMemoryValue;
+        DataIntructionMemory = new DataInstMemory
+        {
+            Memory =
+            {
+                [0] = s.FirstMemoryValue,
+                [4] = s.SecondMemoryValue,
+                [8] = s.ThirdMemoryValue,
+                [12] = s.FourthMemoryValue
+            }
+        };
 
         SrcA.WriteEnable = s.RegisterPcwe;
         SrcB.WriteEnable = s.RegisterInstrWe;
@@ -103,7 +115,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur
         return (SrcB.Output == RightAnswerValue);
     }
 
-    protected override object GetCurrentState()
+    protected override LevelThreeState GetCurrentState()
     {
         return new LevelThreeState
         {
@@ -128,7 +140,6 @@ public class LevelThirdRegisseur : BaseLevelRegisseur
     {
         var path = multiplexerVisualizer.CurrentChosenMuxPath;
         int[] inputs = { SrcA.Output, SrcB.Output };
-        var res = 0;
 
         if (path == -1)
         {
@@ -136,7 +147,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur
         }
         else if (path >= 0 && path <= 1)
         {
-            res = Multiplexer.SelectNto1(inputs, path);
+            Multiplexer.SelectNto1(inputs, path);
         }
         else
         {

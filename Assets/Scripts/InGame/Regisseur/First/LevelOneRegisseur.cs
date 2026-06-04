@@ -15,7 +15,7 @@ public struct LevelOneState
     public int CurrentChoosenMuxPath;
 }
 
-public class LevelOneRegisseur : BaseLevelRegisseur
+public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
 {
     [FormerlySerializedAs("_multiplexerVisualizer")]
     [Header("Level 1 Specific Components")]
@@ -42,9 +42,18 @@ public class LevelOneRegisseur : BaseLevelRegisseur
     protected override void OnLevelStart()
     {
         // Initialization of logical components
-        _srcA = new Register(4); _srcA.WriteEnable = true;
-        _srcB = new Register(2); _srcB.WriteEnable = true;
-        _output = new Register(0); _output.WriteEnable = true;
+        _srcA = new Register(4)
+        {
+            WriteEnable = true
+        };
+        _srcB = new Register(2)
+        {
+            WriteEnable = true
+        };
+        _output = new Register(0)
+        {
+            WriteEnable = true
+        };
 
         // Кэширование UI-панелей визуализаторов
         _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
@@ -60,7 +69,7 @@ public class LevelOneRegisseur : BaseLevelRegisseur
         registerSrcBVisualizer.TriggerBlink();
         registerOutputVisualizer.TriggerBlink();
     }
-    protected override object GetCurrentState()
+    protected override LevelOneState GetCurrentState()
     {
         return new LevelOneState
         {
@@ -73,10 +82,8 @@ public class LevelOneRegisseur : BaseLevelRegisseur
             OutputRegisterWe = _output.WriteEnable
         };
     }
-    protected override void ApplyState(object state)
+    protected override void ApplyState(LevelOneState s)
     {
-        var s = (LevelOneState)state;
-
         _srcA = new Register(s.RegisterAValue);
         _srcB = new Register(s.RegisterBValue);
         _output = new Register(s.OutputRegisterValue);

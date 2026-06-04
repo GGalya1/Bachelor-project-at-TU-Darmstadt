@@ -23,7 +23,7 @@ public struct SubExtendedSevenLevelState
     public int MuxPath;
 }
 
-public class SubExtendedRegisseur : BaseLevelRegisseur
+public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelState>
 {
     [FormerlySerializedAs("_registerSrcAVisualizer")] [SerializeField] protected RegisterVisualizer registerSrcAVisualizer;
     [FormerlySerializedAs("_registerImmediateVisualizer")] [SerializeField] protected RegisterVisualizer registerImmediateVisualizer;
@@ -56,13 +56,28 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
     protected override void OnLevelStart()
     {
         // addi x0, x4, 256
-        SrcA = new Register(4); SrcA.WriteEnable = true;
-        ImmValue = new Register(268566547); ImmValue.WriteEnable = true;
-        A3 = new Register(0); A3.WriteEnable = true;
-        Wd3 = new Register(0); Wd3.WriteEnable = true;
+        SrcA = new Register(4)
+        {
+            WriteEnable = true
+        };
+        ImmValue = new Register(268566547)
+        {
+            WriteEnable = true
+        };
+        A3 = new Register(0)
+        {
+            WriteEnable = true
+        };
+        Wd3 = new Register(0)
+        {
+            WriteEnable = true
+        };
 
-        RegisterFile = new RegisterFile(); RegisterFile.RegisterWriteEnable = true;
-        RegisterFile.InitializeRegisters(new int[] { -98, 1, 39, 43, 0, 6, 8,
+        RegisterFile = new RegisterFile
+        {
+            RegisterWriteEnable = true
+        };
+        RegisterFile.InitializeRegisters(new [] { -98, 1, 39, 43, 0, 6, 8,
                                                      40, 3, 39, 13, 56, 64, 20,
                                                      50, 51, 0, 12, 53, 65, 29,
                                                      60, 61, 0, 25, 54, 0, 28,
@@ -77,10 +92,8 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
         UpdateVizualizers();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(SubExtendedSevenLevelState s)
     {
-        var s = (SubExtendedSevenLevelState)state;
-
         SrcA = new Register(s.RegisterSrcAValue);
         ImmValue = new Register(s.RegisterImmValue);
         A3 = new Register(s.RegisterA3Value);
@@ -138,7 +151,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
         return RegisterFile.Registers[0] == 256;
     }
 
-    protected override object GetCurrentState()
+    protected override SubExtendedSevenLevelState GetCurrentState()
     {
         return new SubExtendedSevenLevelState
         {
@@ -188,9 +201,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
 
         if (TickCounter - 1 >= 0)
         {
-            var legcyState = (SubExtendedSevenLevelState)TickStateValues[TickCounter - 1];
-
-            RegisterFile.WriteAdress = legcyState.RegisterA3Value;
+            RegisterFile.WriteAdress = TickStateValues[TickCounter - 1].RegisterA3Value;
         }
 
         RegisterFile.WriteData = Wd3.Output;
@@ -276,7 +287,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
             var a = 0;
-            if (SrcA.Output > 0 && SrcA.Output < 16)
+            if (SrcA.Output is > 0 and < 16)
                 a = RegisterFile.Registers[SrcA.Output];
 
             var ext = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)ImmValue.Output);

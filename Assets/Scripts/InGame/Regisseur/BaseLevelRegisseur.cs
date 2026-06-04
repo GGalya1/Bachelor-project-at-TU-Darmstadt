@@ -7,7 +7,7 @@ using DG.Tweening;
 using UnityEngine.Serialization;
 
 // A base class for all levels that manages time, history, and completion.
-public abstract class BaseLevelRegisseur : MonoBehaviour
+public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: struct
 {
     [FormerlySerializedAs("_levelTargetDescription")]
     [Header("Level Content Configuration")]
@@ -52,7 +52,7 @@ public abstract class BaseLevelRegisseur : MonoBehaviour
     
     // --- STATE ---
     protected int TickCounter;
-    protected object[] TickStateValues;
+    protected TState[] TickStateValues;
     public int falledTries; // Public for debugging
 
     [FormerlySerializedAs("_busController")]
@@ -66,10 +66,10 @@ public abstract class BaseLevelRegisseur : MonoBehaviour
     protected abstract void HandleClockUpdate();
 
     /// <summary> Must return the current state in a format unique to the level (e.g., levelOneState). </summary>
-    protected abstract object GetCurrentState();
+    protected abstract TState GetCurrentState();
 
     /// <summary> Applies the saved state to the level's internal components. </summary>
-    protected abstract void ApplyState(object state);
+    protected abstract void ApplyState(TState state);
 
     /// <summary> Visually indicates when a tick is triggered (e.g., flashing registers). </summary>
     protected abstract void BlinkClockedComponents();
@@ -107,7 +107,7 @@ public abstract class BaseLevelRegisseur : MonoBehaviour
         levelTargetText.text = levelTargetDescription;
 
         // 2. Initializing history
-        TickStateValues = new object[maxTickNumber]; // Can be _maxTickNumber + 1
+        TickStateValues = new TState[maxTickNumber]; // Can be _maxTickNumber + 1
         SaveCurrentStateAt(0);
     }
 
@@ -240,14 +240,6 @@ public abstract class BaseLevelRegisseur : MonoBehaviour
     protected void SaveCurrentStateAt(int idx)
     {
         TickStateValues[idx] = GetCurrentState();
-    }
-
-    protected void RefreshStateMemoryFromCurrentStep()
-    {
-        for (var i = TickCounter; i < TickStateValues.Length; i++)
-        {
-            TickStateValues[i] = null;
-        }
     }
 
     protected abstract void UpdateVizualizers();

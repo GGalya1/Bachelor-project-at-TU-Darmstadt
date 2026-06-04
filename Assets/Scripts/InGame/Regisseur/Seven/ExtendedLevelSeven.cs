@@ -19,7 +19,7 @@ public struct ExtendedSevenLevelState
     public int AluOperation;
 }
 
-public class ExtendedLevelSeven : BaseLevelRegisseur
+public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
 {
     [FormerlySerializedAs("_registerSrcAVisualizer")]
     [Header("Level Seven Components")]
@@ -52,13 +52,28 @@ public class ExtendedLevelSeven : BaseLevelRegisseur
 
     protected override void OnLevelStart()
     {
-        SrcA = new Register(2); SrcA.WriteEnable = true;
-        SrcB = new Register(8); SrcB.WriteEnable = true;
-        A3 = new Register(0); A3.WriteEnable = true;
-        Wd3 = new Register(0); Wd3.WriteEnable = true;
+        SrcA = new Register(2)
+        {
+            WriteEnable = true
+        };
+        SrcB = new Register(8)
+        {
+            WriteEnable = true
+        };
+        A3 = new Register(0)
+        {
+            WriteEnable = true
+        };
+        Wd3 = new Register(0)
+        {
+            WriteEnable = true
+        };
 
-        RegisterFile = new RegisterFile(); RegisterFile.RegisterWriteEnable = true;
-        RegisterFile.InitializeRegisters(new int[] { 0, 1, 39, 43, 5, 6, 8,
+        RegisterFile = new RegisterFile
+        {
+            RegisterWriteEnable = true
+        };
+        RegisterFile.InitializeRegisters(new [] { 0, 1, 39, 43, 5, 6, 8,
                                                      40, 3, 39, 13, 56, 64, 20,
                                                      50, 51, 0, 12, 53, 65, 29,
                                                      60, 61, 0, 25, 54, 0, 28,
@@ -73,10 +88,8 @@ public class ExtendedLevelSeven : BaseLevelRegisseur
         UpdateVizualizers();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(ExtendedSevenLevelState s)
     {
-        var s = (ExtendedSevenLevelState)state;
-
         SrcA = new Register(s.RegisterSrcAValue);
         SrcB = new Register(s.RegisterSrcBValue);
         A3 = new Register(s.RegisterA3Value);
@@ -123,7 +136,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur
         return RegisterFile.Registers[0] == 42;
     }
 
-    protected override object GetCurrentState()
+    protected override ExtendedSevenLevelState GetCurrentState()
     {
         return new ExtendedSevenLevelState {
             RegisterSrcAValue = SrcA.Output,
@@ -168,9 +181,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur
         Wd3.Input = Alu.Calculate(a, b, aluVizualizer.CurrentAluOperation);
         if (TickCounter - 1 >= 0)
         {
-            var legcyState = (ExtendedSevenLevelState)TickStateValues[TickCounter - 1];
-
-            RegisterFile.WriteAdress = legcyState.RegisterA3Value;
+            RegisterFile.WriteAdress = TickStateValues[TickCounter - 1].RegisterA3Value;
         }
         RegisterFile.WriteData = Wd3.Output;
 

@@ -9,7 +9,7 @@ public struct LevelTwoState
     public int AluOperation;
 }
 
-public class LevelTwoRegisseur : BaseLevelRegisseur
+public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
 {
     [FormerlySerializedAs("_aluVizualizer")]
     [Header("Level 2 Specific Components")]
@@ -29,7 +29,10 @@ public class LevelTwoRegisseur : BaseLevelRegisseur
 
     protected override void OnLevelStart()
     {
-        _srcA = new Register(1); _srcA.WriteEnable = true;
+        _srcA = new Register(1)
+        {
+            WriteEnable = true
+        };
         // second argument must be 4
 
         _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
@@ -37,13 +40,13 @@ public class LevelTwoRegisseur : BaseLevelRegisseur
         UpdateVizualizers();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(LevelTwoState s)
     {
-        var s = (LevelTwoState)state;
+        _srcA = new Register(s.RegisterAValue)
+        {
+            WriteEnable = s.RegisterAwe
+        };
 
-        _srcA = new Register(s.RegisterAValue);
-        _srcA.WriteEnable = s.RegisterAwe;
-        
         aluVizualizer.ChooseAluOperation(s.AluOperation);
     }
 
@@ -58,7 +61,7 @@ public class LevelTwoRegisseur : BaseLevelRegisseur
         return (_srcA.Output == RightAnswerValue);
     }
 
-    protected override object GetCurrentState()
+    protected override LevelTwoState GetCurrentState()
     {
         return new LevelTwoState
         {
@@ -119,7 +122,7 @@ public class LevelTwoRegisseur : BaseLevelRegisseur
 
             busController.StartBusSignal(busController.busSegments[2], _srcA.Input, true);
 
-            var prevVal = TickStateValues[TickCounter] is LevelTwoState s ? s.RegisterAValue : 0;
+            var prevVal = TickStateValues[TickCounter] is var s ? s.RegisterAValue : 0;
 
             yield return StartCoroutine(DelayedSignals(
                 busController.busSegments[0], prevVal,

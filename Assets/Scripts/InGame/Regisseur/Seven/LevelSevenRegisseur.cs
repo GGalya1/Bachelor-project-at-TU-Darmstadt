@@ -16,7 +16,7 @@ public struct LevelSevenState
     public int AluOperation;
 }
 
-public class LevelSevenRegisseur : BaseLevelRegisseur
+public class LevelSevenRegisseur : BaseLevelRegisseur<LevelSevenState>
 {
     [FormerlySerializedAs("_registerSrcAVisualizer")]
     [Header("Level 7 Specific Components")]
@@ -46,12 +46,24 @@ public class LevelSevenRegisseur : BaseLevelRegisseur
     protected override void OnLevelStart()
     {
         // Initialization of logical components
-        SrcA = new Register(6); SrcA.WriteEnable = true;
-        SrcB = new Register(7); SrcB.WriteEnable = true;
-        Output = new Register(0); Output.WriteEnable = true;
+        SrcA = new Register(6)
+        {
+            WriteEnable = true
+        };
+        SrcB = new Register(7)
+        {
+            WriteEnable = true
+        };
+        Output = new Register(0)
+        {
+            WriteEnable = true
+        };
 
-        RegisterFile = new RegisterFile(); RegisterFile.RegisterWriteEnable = true;
-        RegisterFile.InitializeRegisters(new int[] { 0, 1, 39, 43, 5, 6, 2,
+        RegisterFile = new RegisterFile
+        {
+            RegisterWriteEnable = true
+        };
+        RegisterFile.InitializeRegisters(new [] { 0, 1, 39, 43, 5, 6, 2,
                                                      40, 1, 39, 13, 56, 64, 20,
                                                      50, 51, 0, 12, 53, 65, 29,
                                                      60, 61, 0, 1, 54, 0, 28,
@@ -67,10 +79,8 @@ public class LevelSevenRegisseur : BaseLevelRegisseur
         UpdateRegisterFileVizualization();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(LevelSevenState s)
     {
-        var s = (LevelSevenState)state;
-
         SrcA = new Register(s.RegisterAValue);
         SrcB = new Register(s.RegisterBValue);
         Output = new Register(s.RegisterOutputValue);
@@ -111,7 +121,7 @@ public class LevelSevenRegisseur : BaseLevelRegisseur
         return (Output.Output == RightAnswerValue);
     }
 
-    protected override object GetCurrentState()
+    protected override LevelSevenState GetCurrentState()
     {
         return new LevelSevenState
         {

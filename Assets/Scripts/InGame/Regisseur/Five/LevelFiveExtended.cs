@@ -13,7 +13,7 @@ public struct LevelFiveExtendedState
     public int ExtenderOperation;
 }
 
-public class LevelFiveExtended : BaseLevelRegisseur
+public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
 {
     [FormerlySerializedAs("_registerSrcAVisualizer")]
     [Header("Level 5 (Extended) Specific Components")]
@@ -35,8 +35,14 @@ public class LevelFiveExtended : BaseLevelRegisseur
 
     protected override void OnLevelStart()
     {
-        _srcA = new Register((int)inputRegisterValue); _srcA.WriteEnable = true;
-        _output = new Register(0); _output.WriteEnable = true;
+        _srcA = new Register((int)inputRegisterValue)
+        {
+            WriteEnable = true
+        };
+        _output = new Register(0)
+        {
+            WriteEnable = true
+        };
 
         _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
         _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
@@ -44,10 +50,8 @@ public class LevelFiveExtended : BaseLevelRegisseur
         UpdateVizualizers();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(LevelFiveExtendedState s)
     {
-        var s = (LevelFiveExtendedState)state;
-
         _srcA = new Register(s.RegisterValue);
         _output = new Register(s.RegisterOutputValue);
 
@@ -79,7 +83,7 @@ public class LevelFiveExtended : BaseLevelRegisseur
         return _output.Output == RightAnswerValue;
     }
 
-    protected override object GetCurrentState()
+    protected override LevelFiveExtendedState GetCurrentState()
     {
         return new LevelFiveExtendedState
         {

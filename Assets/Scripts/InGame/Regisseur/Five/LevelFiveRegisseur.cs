@@ -23,7 +23,7 @@ public struct LevelFiveState
     public int ExtenderOperation;
 }
 
-public class LevelFiveRegisseur : BaseLevelRegisseur
+public class LevelFiveRegisseur : BaseLevelRegisseur<LevelFiveState>
 {
     [FormerlySerializedAs("_registerSrcAVisualizer")]
     [Header("Level 5 Specific Components")]
@@ -57,11 +57,23 @@ public class LevelFiveRegisseur : BaseLevelRegisseur
     protected override void OnLevelStart()
     {
         // Initialization of logical components
-        _srcA = new Register(0); _srcA.WriteEnable = true;
-        _srcB = new Register(0); _srcB.WriteEnable = true;
-        _output = new Register(0); _output.WriteEnable = true;
+        _srcA = new Register(0)
+        {
+            WriteEnable = true
+        };
+        _srcB = new Register(0)
+        {
+            WriteEnable = true
+        };
+        _output = new Register(0)
+        {
+            WriteEnable = true
+        };
 
-        _dataIntructionMemory = new DataInstMemory(); _dataIntructionMemory.MemoryWrite = true;
+        _dataIntructionMemory = new DataInstMemory
+        {
+            MemoryWrite = true
+        };
 
         _dataIntructionMemory.LoadWord(0, 1048576239);                   // J-Typ (1000)
         _dataIntructionMemory.LoadWord(4, 4314211);                      // B-Typ (16)
@@ -114,7 +126,7 @@ public class LevelFiveRegisseur : BaseLevelRegisseur
         {
             busController.StartBusSignal(busController.busSegments[3], _output.Input, true);
 
-            if (TickStateValues[TickCounter] is LevelFiveState s)
+            if (TickStateValues[TickCounter] is var s)
             {
                 yield return StartCoroutine(DelayedSignal(busController.busSegments[2], s.RegisterInstrValue, true));
 
@@ -142,17 +154,9 @@ public class LevelFiveRegisseur : BaseLevelRegisseur
         _dataIntructionMemory.MemoryWrite = registerOutputVisualizer.isWriteEnabled;
 
         // implementation
-        if (_dataIntructionMemory.Memory.ContainsKey(_srcA.Output))
-        {
-            _srcB.Input = _dataIntructionMemory.Memory[_srcA.Output];
-        }
-        else
-        {
-            _srcB.Input = 0;
-            // if(dataIntructionMemory.MemoryWrite)
-            //  XXX
-        }
-
+        _srcB.Input = _dataIntructionMemory.Memory.ContainsKey(_srcA.Output) ? _dataIntructionMemory.Memory[_srcA.Output] : 0;
+        // if(dataIntructionMemory.MemoryWrite)
+        //  XXX
         _srcA.Input = Alu.Calculate(_srcA.Output, 4, aluVizualizer.CurrentAluOperation);
 
         _output.Input = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)_srcB.Output);
@@ -188,7 +192,7 @@ public class LevelFiveRegisseur : BaseLevelRegisseur
         _dataIntructionMemory.Clock();
     }
 
-    protected override object GetCurrentState() {
+    protected override LevelFiveState GetCurrentState() {
         return new LevelFiveState
         {
             RegisterPCValue = _srcA.Output,
@@ -211,19 +215,22 @@ public class LevelFiveRegisseur : BaseLevelRegisseur
 };
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(LevelFiveState s)
     {
-        var s = (LevelFiveState)state;
-
         _srcA = new Register(s.RegisterPCValue);
         _srcB = new Register(s.RegisterInstrValue);
         _output = new Register(s.RegisterOutputValue);
 
-        _dataIntructionMemory = new DataInstMemory();
-        _dataIntructionMemory.Memory[0] = s.FirstMemoryValue;
-        _dataIntructionMemory.Memory[4] = s.SecondMemoryValue;
-        _dataIntructionMemory.Memory[8] = s.ThirdMemoryValue;
-        _dataIntructionMemory.Memory[12] = s.FourthMemoryValue;
+        _dataIntructionMemory = new DataInstMemory
+        {
+            Memory =
+            {
+                [0] = s.FirstMemoryValue,
+                [4] = s.SecondMemoryValue,
+                [8] = s.ThirdMemoryValue,
+                [12] = s.FourthMemoryValue
+            }
+        };
 
         _srcA.WriteEnable = s.RegisterPcwe;
         _srcB.WriteEnable = s.RegisterInstrWe;
@@ -301,30 +308,18 @@ public class LevelFiveRegisseur : BaseLevelRegisseur
 
     protected override bool CheckWinCondition()
     {
-        if (TickStateValues == null 
-            || TickStateValues[4] == null
-            || TickStateValues[2] == null
-            || TickStateValues[3] == null) 
+        if (TickStateValues == null) 
         { return false; }
 
-        if (!(TickStateValues[4] is LevelFiveState s3)) return false;
-        if (!(TickStateValues[2] is LevelFiveState s1)) return false;
-        if (!(TickStateValues[3] is LevelFiveState s2)) return false;
-
-        var val1 = (uint)s1.RegisterOutputValue;
-        var val2 = (uint)s2.RegisterOutputValue;
-        var val3 = (uint)s3.RegisterOutputValue;
+        var val1 = (uint)TickStateValues[2].RegisterOutputValue;
+        var val2 = (uint)TickStateValues[3].RegisterOutputValue;
+        var val3 = (uint)TickStateValues[4].RegisterOutputValue;
         var val4 = (uint)_output.Output;
 
-        if (val1 != 1000 ||
-            val2 != 8 ||
-            val3 != 8 ||
-            val4 != 4)
-        {
-            return false;
-        }
-
-        return true;
+        return val1 == 1000 &&
+               val2 == 8 &&
+               val3 == 8 &&
+               val4 == 4;
     }
 
     protected override void UpdateVizualizers()

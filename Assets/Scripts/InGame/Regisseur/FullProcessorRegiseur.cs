@@ -44,7 +44,7 @@ public enum ExerciseTyp {
     JAL = 3,
 }
 
-public class FullProcessorRegiseur : BaseLevelRegisseur
+public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
 {
     [FormerlySerializedAs("_registerPCVisualizer")]
     [Header("Precossor Specific Components")]
@@ -110,22 +110,49 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
     }
     protected override void OnLevelStart()
     {
-        _pc = new Register(Initial.pcRegisterInitialValue);               _pc.WriteEnable = true;
-        _oldPC = new Register(0);            _oldPC.WriteEnable = true;
-        _instructionReg = new Register(0);   _instructionReg.WriteEnable = true;
-        _dataReg = new Register(0);          _dataReg.WriteEnable = true;
-        _srcA = new Register(0);             _srcA.WriteEnable = true;
-        _srcB = new Register(0);             _srcB.WriteEnable = true;
-        _aluOutReg = new Register(0);        _aluOutReg.WriteEnable = true;
+        _pc = new Register(Initial.pcRegisterInitialValue)
+        {
+            WriteEnable = true
+        };
+        _oldPC = new Register(0)
+        {
+            WriteEnable = true
+        };
+        _instructionReg = new Register(0)
+        {
+            WriteEnable = true
+        };
+        _dataReg = new Register(0)
+        {
+            WriteEnable = true
+        };
+        _srcA = new Register(0)
+        {
+            WriteEnable = true
+        };
+        _srcB = new Register(0)
+        {
+            WriteEnable = true
+        };
+        _aluOutReg = new Register(0)
+        {
+            WriteEnable = true
+        };
 
-        RegisterFile = new RegisterFile(); RegisterFile.RegisterWriteEnable = true;
-        RegisterFile.InitializeRegisters(new int[] { 0, 1, 39, 43, 5, 6, 8,
+        RegisterFile = new RegisterFile
+        {
+            RegisterWriteEnable = true
+        };
+        RegisterFile.InitializeRegisters(new [] { 0, 1, 39, 43, 5, 6, 8,
                                                      40, 3, 39, 13, 56, 63, 20,
                                                      50, 51, 0, 12, 53, 65, 29,
                                                      60, 61, 0, 25, 54, 0, 28,
                                                      70, 30, 31, 0});
 
-        _dataIntructionMemory = new DataInstMemory(); _dataIntructionMemory.MemoryWrite = true;
+        _dataIntructionMemory = new DataInstMemory
+        {
+            MemoryWrite = true
+        };
 
         _dataIntructionMemory.LoadWord(0, Initial.firstMemoWord);
         _dataIntructionMemory.LoadWord(4, Initial.secondMemoWord);
@@ -144,10 +171,8 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
         UpdateVizualizers();
     }
 
-    protected override void ApplyState(object state)
+    protected override void ApplyState(ProcessorLevelState s)
     {
-        var s = (ProcessorLevelState)state;
-
         _pc = new Register(s.RegisterPCValue);
         _oldPC = new Register(s.RegisterOldPCValue);
         _instructionReg = new Register(s.RegisterInstrValue);
@@ -161,11 +186,16 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
         ApplyMuxState(s.MuXsrcBPath, srcBmuxVisualizer);
         ApplyMuxState(s.MuXresultPath, resultMuxVisualizer);
 
-        _dataIntructionMemory = new DataInstMemory();
-        _dataIntructionMemory.Memory[0] = s.FirstMemoryValue;
-        _dataIntructionMemory.Memory[4] = s.SecondMemoryValue;
-        _dataIntructionMemory.Memory[8] = s.ThirdMemoryValue;
-        _dataIntructionMemory.Memory[12] = s.FourthMemoryValue;
+        _dataIntructionMemory = new DataInstMemory
+        {
+            Memory =
+            {
+                [0] = s.FirstMemoryValue,
+                [4] = s.SecondMemoryValue,
+                [8] = s.ThirdMemoryValue,
+                [12] = s.FourthMemoryValue
+            }
+        };
 
         // noch Register File einfuegen
         RegisterFile.InitializeRegisters(s.RegisterFieldValue);
@@ -258,7 +288,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
         }
     }
 
-    protected override object GetCurrentState()
+    protected override ProcessorLevelState GetCurrentState()
     {
         return new ProcessorLevelState
         {
@@ -357,10 +387,8 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
         #region fourth step (WB)
         
         if (TickCounter - 2 >= 0) {
-            var legcyState = (ProcessorLevelState)TickStateValues[TickCounter - 2];
-
-            RegisterFile.WriteAdress = ((legcyState.RegisterInstrValue >> 7) & 0x1F);
-            RegisterFile.WriteData = legcyState.RegisterInstrValue;
+            RegisterFile.WriteAdress = ((TickStateValues[TickCounter - 2].RegisterInstrValue >> 7) & 0x1F);
+            RegisterFile.WriteData = TickStateValues[TickCounter - 2].RegisterInstrValue;
         }
 
         var tmpResult = CalculateResultMux();
@@ -529,8 +557,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
 
         var extenderTmp = 0;
         if (TickCounter > 0) {
-            var legcyState = (ProcessorLevelState)TickStateValues[TickCounter - 1];
-            extenderTmp = legcyState.RegisterInstrValue;
+            extenderTmp =  TickStateValues[TickCounter - 1].RegisterInstrValue;
         }
         var muxSrcB = EvaluateMux(srcBmuxVisualizer.CurrentChosenMuxPath, 
             _srcB.Output, 
@@ -669,10 +696,8 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
         }
         else if (TickCounter - 4 >= 0)
         {
-            var s = (ProcessorLevelState)TickStateValues[TickCounter - 3];
-
-            if (s.RegisterInstrValue < 1000000) return;
-            var opcode = s.RegisterInstrValue & 0x7F;
+            if (TickStateValues[TickCounter - 3].RegisterInstrValue < 1000000) return;
+            var opcode = TickStateValues[TickCounter - 3].RegisterInstrValue & 0x7F;
 
             if (opcode == 0x03)
             {
@@ -681,7 +706,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
         }
         else if (TickCounter - 3 >= 0)
         {
-            var s = (ProcessorLevelState)TickStateValues[TickCounter - 2];
+            var s = TickStateValues[TickCounter - 2];
 
             if (s.RegisterInstrValue < 1000000) return;
             var opcode = s.RegisterInstrValue & 0x7F;
@@ -705,7 +730,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
             }
         }
         else if (TickCounter - 2 >= 0) {
-            var s = (ProcessorLevelState)TickStateValues[TickCounter - 1];
+            var s = TickStateValues[TickCounter - 1];
 
             if (s.RegisterInstrValue < 1000000) return;
             var opcode = s.RegisterInstrValue & 0x7F;
