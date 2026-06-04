@@ -75,14 +75,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
         InfoWd3Register = registerWd3Visualizer.UIRegisterPanel;
 
 
-        if (levelTargetDescription == null || levelTargetDescription.Length == 0)
-        {
-            levelTargetText.text = $"Hier Ziel schreiben";
-        }
-        else
-        {
-            levelTargetText.text = levelTargetDescription;
-        }
+        levelTargetText.text = string.IsNullOrEmpty(levelTargetDescription) ? $"Hier Ziel schreiben" : levelTargetDescription;
 
         UpdateVizualizers();
     }
@@ -106,27 +99,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
         aluVizualizer.ChooseAluOperation(s.AluOperation);
         extenderVizualizer.ChooseAluOperation(s.ExtenderOperation);
 
-        var currentPath = s.MuxPath;
-        if (currentPath == -1)
-        {
-            muxVisualizer.ResetVisualisation();
-        }
-        else if (currentPath == 0)
-        {
-            muxVisualizer.SelectPath(0);
-        }
-        else if (currentPath == 1)
-        {
-            muxVisualizer.SelectPath(1);
-        }
-        else if (currentPath == 2)
-        {
-            muxVisualizer.SelectPath(2);
-        }
-        else
-        {
-            Debug.LogError($"Saved multiplexer value {currentPath} is not in [0, 3]");
-        }
+        ApplyMuxState(s.MuxPath, muxVisualizer);
     }
 
     protected override void BlinkClockedComponents()

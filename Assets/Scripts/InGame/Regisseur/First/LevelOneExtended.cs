@@ -45,10 +45,11 @@ public class LevelOneExtended : BaseLevelRegisseur
 
         _output = new Register(s.RegisterOutputValue);
 
-        MuxVizualizerHelper(s.MuXup, upperMuxVisualizer);
-        MuxVizualizerHelper(s.MuXmiddle, middleMuxVisualizer);
-        MuxVizualizerHelper(s.MuXdown, downMuxVisualizer);
-        MuxVizualizerHelper(s.MuXoutput, outputMuxVisualizer);
+        
+        ApplyMuxState(s.MuXup, upperMuxVisualizer);
+        ApplyMuxState(s.MuXmiddle, middleMuxVisualizer);
+        ApplyMuxState(s.MuXdown, downMuxVisualizer);
+        ApplyMuxState(s.MuXoutput, outputMuxVisualizer);
     }
 
     protected override void BlinkClockedComponents()
@@ -184,29 +185,6 @@ public class LevelOneExtended : BaseLevelRegisseur
     }
 
     #region helpers
-    private void MuxVizualizerHelper(int currentPath, MultiplexerVisualizer mux)
-    {
-        if (currentPath == -1)
-        {
-            mux.ResetVisualisation();
-        }
-        else if (currentPath == 0)
-        {
-            mux.SelectPath(0);
-        }
-        else if (currentPath == 1)
-        {
-            mux.SelectPath(1);
-        }
-        else if (currentPath == 2)
-        {
-            mux.SelectPath(2);
-        }
-        else
-        {
-            Debug.LogError($"Saved multiplexer value {currentPath} is not in [0, 3]");
-        }
-    }
     private void SwitchMuxInteractables(bool trigger, MultiplexerVisualizer target)
     {
         target.UIController.FirstWayButton.interactable = trigger;

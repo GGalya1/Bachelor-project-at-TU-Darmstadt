@@ -43,21 +43,14 @@ public class LevelZeroRegisseur : BaseLevelRegisseur
     {
         _srcA = new Register(srcAValue); _srcA.WriteEnable = true;
         _srcB = new Register(srcBValue); _srcB.WriteEnable = true;
-        _output = new Register(0); _output.WriteEnable = true;
+        _output = new Register(); _output.WriteEnable = true;
 
         // Caching of UI panels for visualizers
         _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
         _infoSrcBRegister = registerSrcBVisualizer.UIRegisterPanel;
         _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
 
-        if (levelTargetDescription == null || levelTargetDescription.Length == 0)
-        {
-            levelTargetText.text = "Ziel: \r\nSchreibe in Register 3 den Wert 4";
-        }
-        else
-        {
-            levelTargetText.text = levelTargetDescription;
-        }
+        levelTargetText.text = string.IsNullOrEmpty(levelTargetDescription) ? "Ziel: \r\nSchreibe in Register 3 den Wert 4" : levelTargetDescription;
 
 
         UpdateVizualizers();
@@ -102,7 +95,7 @@ public class LevelZeroRegisseur : BaseLevelRegisseur
 
     protected override void HandleClockUpdate()
     {
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizers and concrete objects
         _srcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         _srcB.WriteEnable = registerSrcBVisualizer.isWriteEnabled;
         _output.WriteEnable = registerOutputVisualizer.isWriteEnabled;

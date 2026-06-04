@@ -115,7 +115,7 @@ public abstract class BaseLevelRegisseur : MonoBehaviour
         // A method for overriding in a subclass (e.g., setting initial values for registers or strings)
     }
 
-    public void HandleNextTick()
+    private void HandleNextTick()
     {
         if (TickCounter >= maxTickNumber || isProcessing) { return; }
         StartCoroutine(NextTickSequence());
@@ -153,7 +153,7 @@ public abstract class BaseLevelRegisseur : MonoBehaviour
         ReleaseIngameInteractables();
     }
 
-    public void HandlePrevTick()
+    private void HandlePrevTick()
     {
         if (TickCounter <= 0 || isProcessing) { return; }
         StartCoroutine(PrevTickSequence());
@@ -322,4 +322,21 @@ public abstract class BaseLevelRegisseur : MonoBehaviour
         };
     }
     #endregion
+    
+    # region STATIC HELPER METHODS
+    
+    protected static void ApplyMuxState(int path, MultiplexerVisualizer mux)
+    {
+        switch (path)
+        {
+            case -1:
+                mux.ResetVisualisation();
+                break;
+            case >= 0 and <= 2:
+                mux.SelectPath(path);
+                break;
+        }
+    }
+    
+    # endregion
 }

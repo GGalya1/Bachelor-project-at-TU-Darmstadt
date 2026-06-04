@@ -166,11 +166,11 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
         _srcA = new Register(s.RegisterScrAValue);
         _srcB = new Register(s.RegisterSrcBValue);
         _aluOutReg = new Register(s.RegisterAluOutValue);
-
-        MuxVizualizerHelper(s.MuXadrPath, adrMuxVisualizer);
-        MuxVizualizerHelper(s.MuXsrcAPath, srcAmuxVisualizer);
-        MuxVizualizerHelper(s.MuXsrcBPath, srcBmuxVisualizer);
-        MuxVizualizerHelper(s.MuXresultPath, resultMuxVisualizer);
+        
+        ApplyMuxState(s.MuXadrPath, adrMuxVisualizer);
+        ApplyMuxState(s.MuXsrcAPath, srcAmuxVisualizer);
+        ApplyMuxState(s.MuXsrcBPath, srcBmuxVisualizer);
+        ApplyMuxState(s.MuXresultPath, resultMuxVisualizer);
 
         _dataIntructionMemory = new DataInstMemory();
         _dataIntructionMemory.Memory[0] = s.FirstMemoryValue;
@@ -191,28 +191,6 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
 
         aluVizualizer.ChooseAluOperation(s.AluOperation);
         extenderVizualizer.ChooseAluOperation(s.ExtenderOperation);
-    }
-    private void MuxVizualizerHelper(int currentPath, MultiplexerVisualizer mux) {
-        if (currentPath == -1)
-        {
-            mux.ResetVisualisation();
-        }
-        else if (currentPath == 0)
-        {
-            mux.SelectPath(0);
-        }
-        else if (currentPath == 1)
-        {
-            mux.SelectPath(1);
-        }
-        else if (currentPath == 2)
-        {
-            mux.SelectPath(2);
-        }
-        else
-        {
-            Debug.LogError($"Saved multiplexer value {currentPath} is not in [0, 3]");
-        }
     }
 
     protected override void BlinkClockedComponents()

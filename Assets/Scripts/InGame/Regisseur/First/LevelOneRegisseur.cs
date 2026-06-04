@@ -52,7 +52,7 @@ public class LevelOneRegisseur : BaseLevelRegisseur
         _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
 
 
-        if (levelTargetDescription == null || levelTargetDescription.Length == 0)
+        if (string.IsNullOrEmpty(levelTargetDescription))
         {
             levelTargetText.text = "Ziel: \r\nSchreibe in Register 3 den Wert 4";
         }
@@ -93,28 +93,8 @@ public class LevelOneRegisseur : BaseLevelRegisseur
         _srcA.WriteEnable = s.RegisterAwe;
         _srcB.WriteEnable = s.RegisterBwe;
         _output.WriteEnable = s.OutputRegisterWe;
-
-        var temp = s.CurrentChoosenMuxPath;
-        if (temp == -1)
-        {
-            multiplexerVisualizer.ResetVisualisation();
-        }
-        else if (temp == 0)
-        {
-            multiplexerVisualizer.SelectPath(0);
-        }
-        else if (temp == 1)
-        {
-            multiplexerVisualizer.SelectPath(1);
-        }
-        else if (temp == 2)
-        {
-            multiplexerVisualizer.SelectPath(2);
-        }
-        else
-        {
-            Debug.LogError($"Saved multiplexer value {temp} is not in [0, 2]");
-        }
+        
+        ApplyMuxState(s.CurrentChoosenMuxPath, multiplexerVisualizer);
     }
     protected override void UpdateVizualizers()
     {
