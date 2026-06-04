@@ -652,17 +652,17 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
 
         _infoPCRegister.Display("PC Register", $"{_pc.Output}");
         _infoOldPCRegister.Display("Old PC Register", $"{_oldPC.Output}");
-        _infoIntructionRegister.Display("Instruction Register", CommandBuilder((uint)_instructionReg.Output));
+        _infoIntructionRegister.Display("Instruction Register", RiscVDecoder.CommandBuilder((uint)_instructionReg.Output));
         _infoDataRegister.Display("Data Register", $"{_dataReg.Output}");
         _infoSrcARegister.Display("SrcA Register", $"{_srcA.Output}");
         _infoSrcBRegister.Display("SrcB Register", $"{_srcB.Output}");
         _infoAluOutRegister.Display("ALU Out Register", $"{_aluOutReg.Output}");
 
         memoryVisualizer.UIRegisterPanel.Display(
-            CommandBuilder((uint)_dataIntructionMemory.Memory[0]),
-            CommandBuilder((uint)_dataIntructionMemory.Memory[4]),
-            CommandBuilder((uint)_dataIntructionMemory.Memory[8]),
-            CommandBuilder((uint)_dataIntructionMemory.Memory[12])
+            RiscVDecoder.CommandBuilder((uint)_dataIntructionMemory.Memory[0]),
+            RiscVDecoder.CommandBuilder((uint)_dataIntructionMemory.Memory[4]),
+            RiscVDecoder.CommandBuilder((uint)_dataIntructionMemory.Memory[8]),
+            RiscVDecoder.CommandBuilder((uint)_dataIntructionMemory.Memory[12])
         );
         registerFileVisualizer.UIRegisterPanel.Display(_registerFile.Registers);
 

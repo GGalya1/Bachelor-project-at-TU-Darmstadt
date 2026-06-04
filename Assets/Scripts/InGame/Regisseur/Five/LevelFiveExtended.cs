@@ -141,7 +141,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
 
     protected override void UpdateVisualizers()
     {
-        _infoSrcARegister.Display("Register 1", CommandBuilder((uint)_srcA.Output));
+        _infoSrcARegister.Display("Register 1", RiscVDecoder.CommandBuilder((uint)_srcA.Output));
         _infoOutputRegister.Display("Register 2", $"{_output.Output}");
         registerSrcAVisualizer.ForceUpdateWriteEnableVisualization(_srcA.WriteEnable);
         registerOutputVisualizer.ForceUpdateWriteEnableVisualization(_output.WriteEnable);

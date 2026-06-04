@@ -316,7 +316,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
     protected override void UpdateVisualizers()
     {
         InfoSrcARegister.Display("Register A1", $"{SrcA.Output}");
-        InfoImmRegister.Display("Register A2", CommandBuilder((uint)ImmValue.Output));
+        InfoImmRegister.Display("Register A2", RiscVDecoder.CommandBuilder((uint)ImmValue.Output));
         InfoA3Register.Display("Register A3", $"{A3.Output}");
         InfoWd3Register.Display("Register WD3", $"{Wd3.Output}");
 

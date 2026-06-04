@@ -301,7 +301,7 @@ public class LevelFiveRegisseur : BaseLevelRegisseur<LevelFiveState>
     protected override void UpdateVisualizers()
     {
         _infoSrcARegister.Display("Register 1", $"{_srcA.Output}");
-        _infoSrcBRegister.Display("Register 2", CommandBuilder((uint)_srcB.Output));
+        _infoSrcBRegister.Display("Register 2", RiscVDecoder.CommandBuilder((uint)_srcB.Output));
         _infoOutputRegister.Display("Register 3", $"{_output.Output}");
         registerSrcAVisualizer.ForceUpdateWriteEnableVisualization(_srcA.WriteEnable);
         registerSrcBVisualizer.ForceUpdateWriteEnableVisualization(_srcB.WriteEnable);
@@ -309,10 +309,10 @@ public class LevelFiveRegisseur : BaseLevelRegisseur<LevelFiveState>
 
         
         memoryVisualizer.UIRegisterPanel.Display(
-            CommandBuilder((uint)_dataInstructionMemory.Memory[0]),
-            CommandBuilder((uint)_dataInstructionMemory.Memory[4]),
-            CommandBuilder((uint)_dataInstructionMemory.Memory[8]),
-            CommandBuilder((uint)_dataInstructionMemory.Memory[12])
+            RiscVDecoder.CommandBuilder((uint)_dataInstructionMemory.Memory[0]),
+            RiscVDecoder.CommandBuilder((uint)_dataInstructionMemory.Memory[4]),
+            RiscVDecoder.CommandBuilder((uint)_dataInstructionMemory.Memory[8]),
+            RiscVDecoder.CommandBuilder((uint)_dataInstructionMemory.Memory[12])
         );
         memoryVisualizer.ForceUpdateWriteEnableVisualization (_dataInstructionMemory.MemoryWrite);
     }
