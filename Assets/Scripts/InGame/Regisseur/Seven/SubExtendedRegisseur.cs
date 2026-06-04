@@ -182,10 +182,10 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
         RegisterFile.ReadRegisters();
 
         var a = 0;
-        if (SrcA.Output > 0 && SrcA.Output < 16)
+        if (SrcA.Output is > 0 and < 16)
             a = RegisterFile.Registers[SrcA.Output];
         var ext = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)ImmValue.Output);
-        var muxVal = CalculateMux(0, ext, -1, muxVisualizer.CurrentChosenMuxPath);
+        var muxVal = EvaluateMux(0, ext, -1, muxVisualizer.CurrentChosenMuxPath);
 
         Wd3.Input = Alu.Calculate(a, muxVal, aluVizualizer.CurrentAluOperation);
 
@@ -249,7 +249,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
             var ext = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)ImmValue.Output);
-            var mux = CalculateMux(0, ext, -1, muxVisualizer.CurrentChosenMuxPath);
+            var mux = EvaluateMux(0, ext, -1, muxVisualizer.CurrentChosenMuxPath);
 
             busController.StartBusSignal(busController.busSegments[3], RegisterFile.Registers[SrcA.Output], true);
             busController.StartBusSignal(busController.busSegments[6], mux, true);
@@ -283,7 +283,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
                 a = RegisterFile.Registers[SrcA.Output];
 
             var ext = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)ImmValue.Output);
-            var mux = CalculateMux(0, ext, -1, muxVisualizer.CurrentChosenMuxPath);
+            var mux = EvaluateMux(0, ext, -1, muxVisualizer.CurrentChosenMuxPath);
 
             busController.StartBusSignal(busController.busSegments[4], 0);
             busController.StartBusSignal(busController.busSegments[5], ext);
@@ -323,28 +323,4 @@ public class SubExtendedRegisseur : BaseLevelRegisseur
 
         registerFileVisualizer.ForceUpdateWriteEnableVisualization(RegisterFile.RegisterWriteEnable);
     }
-
-    #region helpers
-    private int CalculateMux(int muxCurrentPath, int first, int second, int third)
-    {
-        var result = 0;
-        if (muxCurrentPath == 0)
-        {
-            result = first;
-        }
-        else if (muxCurrentPath == 1)
-        {
-            result = second;
-        }
-        else if (muxCurrentPath == 2)
-        {
-            result = third;
-        }
-        /*else
-        {
-            Debug.LogError($"Unexpected MUX path {muxCurrentPath}. Expected value: [0, 3]");
-        }*/
-        return result;
-    }
-    #endregion
 }

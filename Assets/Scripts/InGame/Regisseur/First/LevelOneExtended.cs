@@ -89,11 +89,11 @@ public class LevelOneExtended : BaseLevelRegisseur
 
     protected override void HandleClockUpdate()
     {
-        var up = CalculateMux(upperMuxVisualizer.CurrentChosenMuxPath, -4, 0, -1);
-        var left = CalculateMux(middleMuxVisualizer.CurrentChosenMuxPath, 8, 12, -1);
-        var down = CalculateMux(downMuxVisualizer.CurrentChosenMuxPath, left, -8, -12);
+        var up = EvaluateMux(upperMuxVisualizer.CurrentChosenMuxPath, -4, 0, -1);
+        var left = EvaluateMux(middleMuxVisualizer.CurrentChosenMuxPath, 8, 12, -1);
+        var down = EvaluateMux(downMuxVisualizer.CurrentChosenMuxPath, left, -8, -12);
 
-        _output.Input = CalculateMux(outputMuxVisualizer.CurrentChosenMuxPath, up, 4, down);
+        _output.Input = EvaluateMux(outputMuxVisualizer.CurrentChosenMuxPath, up, 4, down);
 
         _output.PreClockUpdate();
         _output.Clock();
@@ -115,7 +115,7 @@ public class LevelOneExtended : BaseLevelRegisseur
         {
             var up = upperMuxVisualizer.CurrentChosenMuxPath == 0 ? -4 : 0;
             var left = middleMuxVisualizer.CurrentChosenMuxPath == 0 ? 8 : 12;
-            var down = CalculateMux(downMuxVisualizer.CurrentChosenMuxPath, left, -8, -12);
+            var down = EvaluateMux(downMuxVisualizer.CurrentChosenMuxPath, left, -8, -12);
 
             busController.StartBusSignal(busController.busSegments[10], _output.Input, true);
             yield return new WaitUntil(() => busController.NoActiveSignals);
@@ -146,10 +146,10 @@ public class LevelOneExtended : BaseLevelRegisseur
     {
         if (CurrentBus >= 0 && CurrentBus < maxTickNumber)
         {
-            var up = CalculateMux(upperMuxVisualizer.CurrentChosenMuxPath, -4, 0, -1);
-            var left = CalculateMux(middleMuxVisualizer.CurrentChosenMuxPath, 8, 12, -1);
-            var down = CalculateMux(downMuxVisualizer.CurrentChosenMuxPath, left, -8, -12);
-            var output = CalculateMux(outputMuxVisualizer.CurrentChosenMuxPath, up, 4, down);
+            var up = EvaluateMux(upperMuxVisualizer.CurrentChosenMuxPath, -4, 0, -1);
+            var left = EvaluateMux(middleMuxVisualizer.CurrentChosenMuxPath, 8, 12, -1);
+            var down = EvaluateMux(downMuxVisualizer.CurrentChosenMuxPath, left, -8, -12);
+            var output = EvaluateMux(outputMuxVisualizer.CurrentChosenMuxPath, up, 4, down);
 
             busController.StartBusSignal(busController.busSegments[0], 8);
             busController.StartBusSignal(busController.busSegments[1], 12);
@@ -190,27 +190,6 @@ public class LevelOneExtended : BaseLevelRegisseur
         target.UIController.FirstWayButton.interactable = trigger;
         target.UIController.SecondWayButton.interactable = trigger;
         target.UIController.ThirdWayButton.interactable = trigger;
-    }
-    private int CalculateMux(int muxCurrentPath, int first, int second, int third)
-    {
-        var result = 0;
-        if (muxCurrentPath == 0)
-        {
-            result = first;
-        }
-        else if (muxCurrentPath == 1)
-        {
-            result = second;
-        }
-        else if (muxCurrentPath == 2)
-        {
-            result = third;
-        }
-        /*else
-        {
-            Debug.LogError($"Unexpected MUX path {muxCurrentPath}. Expected value: [0, 3]");
-        }*/
-        return result;
     }
     #endregion
 }

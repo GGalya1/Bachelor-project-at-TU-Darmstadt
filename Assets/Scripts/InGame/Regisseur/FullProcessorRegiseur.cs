@@ -142,14 +142,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
         _infoAluOutRegister = registerAluOutVisualizer.UIRegisterPanel;
 
 
-        if (levelTargetDescription == null || levelTargetDescription.Length == 0)
-        {
-            levelTargetText.text = $"Hier Ziel schreiben";
-        }
-        else
-        {
-            levelTargetText.text = levelTargetDescription;
-        }
+        levelTargetText.text = string.IsNullOrEmpty(levelTargetDescription) ? $"Hier Ziel schreiben" : levelTargetDescription;
 
 
         UpdateVizualizers();
@@ -571,47 +564,28 @@ public class FullProcessorRegiseur : BaseLevelRegisseur
         busController.StartBusSignal(secondBusToStart, val2, secondReverse);
     }
     private int CalculateSrcAmux() { 
-        return CalculateMux(srcAmuxVisualizer.CurrentChosenMuxPath, _pc.Output, _oldPC.Output, _srcA.Output);
+        return EvaluateMux(srcAmuxVisualizer.CurrentChosenMuxPath, _pc.Output, _oldPC.Output, _srcA.Output);
     }
     private int CalculateSrBmux()
     {
-        return CalculateMux(srcBmuxVisualizer.CurrentChosenMuxPath, _srcB.Output, Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)_instructionReg.Output), 4);
+        return EvaluateMux(srcBmuxVisualizer.CurrentChosenMuxPath, _srcB.Output, Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)_instructionReg.Output), 4);
     }
     private int CalculateResultMux() { 
-        return CalculateMux(resultMuxVisualizer.CurrentChosenMuxPath, _aluOutReg.Output, _dataReg.Output, CalculateAlu());
+        return EvaluateMux(resultMuxVisualizer.CurrentChosenMuxPath, _aluOutReg.Output, _dataReg.Output, CalculateAlu());
     }
     private int CalculateAdressMux() { 
-        return CalculateMux(adrMuxVisualizer.CurrentChosenMuxPath, _pc.Output, CalculateResultMux(), 0);
+        return EvaluateMux(adrMuxVisualizer.CurrentChosenMuxPath, _pc.Output, CalculateResultMux(), 0);
     }
-    private int CalculateMux(int muxCurrentPath, int first, int second, int third) {
-        var result = 0;
-        if (muxCurrentPath == 0)
-        {
-            result = first;
-        }
-        else if (muxCurrentPath == 1)
-        {
-            result = second;
-        }
-        else if (muxCurrentPath == 2)
-        {
-            result = third;
-        }
-        /*else
-        {
-            Debug.LogError($"Unexpected MUX path {muxCurrentPath}. Expected value: [0, 3]");
-        }*/
-        return result;
-    }
+    
     private int CalculateAlu() {
-        var muxSrcA = CalculateMux(srcAmuxVisualizer.CurrentChosenMuxPath, _pc.Output, _oldPC.Output, _srcA.Output);
+        var muxSrcA = EvaluateMux(srcAmuxVisualizer.CurrentChosenMuxPath, _pc.Output, _oldPC.Output, _srcA.Output);
 
         var extenderTmp = 0;
         if (TickCounter > 0) {
             var legcyState = (ProcessorLevelState)TickStateValues[TickCounter - 1];
             extenderTmp = legcyState.RegisterInstrValue;
         }
-        var muxSrcB = CalculateMux(srcBmuxVisualizer.CurrentChosenMuxPath, 
+        var muxSrcB = EvaluateMux(srcBmuxVisualizer.CurrentChosenMuxPath, 
             _srcB.Output, 
             Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)extenderTmp), 
             4);
