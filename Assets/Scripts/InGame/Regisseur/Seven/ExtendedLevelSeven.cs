@@ -28,7 +28,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
     [FormerlySerializedAs("_registerA3Visualizer")] [SerializeField] protected RegisterVisualizer registerA3Visualizer;
     [FormerlySerializedAs("_registerWD3Visualizer")] [SerializeField] protected RegisterVisualizer registerWd3Visualizer;
 
-    [FormerlySerializedAs("_aluVizualizer")] [SerializeField] protected AluVisualiser aluVizualizer;
+    [FormerlySerializedAs("aluVisualizer")] [FormerlySerializedAs("_aluVizualizer")] [SerializeField] protected AluVisualiser aluVisualizer;
 
     [FormerlySerializedAs("_registerFileVisualizer")] [SerializeField] protected RegisterFileVisualizer registerFileVisualizer;
 
@@ -60,11 +60,11 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
         {
             WriteEnable = true
         };
-        A3 = new Register(0)
+        A3 = new Register()
         {
             WriteEnable = true
         };
-        Wd3 = new Register(0)
+        Wd3 = new Register()
         {
             WriteEnable = true
         };
@@ -85,7 +85,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
         InfoA3Register = registerA3Visualizer.UIRegisterPanel;
         InfoWd3Register = registerWd3Visualizer.UIRegisterPanel;
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void ApplyState(ExtendedSevenLevelState s)
@@ -102,7 +102,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
         A3.WriteEnable = s.RegisterA3We;
         Wd3.WriteEnable = s.RegisterWd3We;
 
-        aluVizualizer.ChooseAluOperation(s.AluOperation);
+        aluVisualizer.ChooseAluOperation(s.AluOperation);
     }
 
     protected override void BlinkClockedComponents()
@@ -116,7 +116,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
 
     }
 
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         registerFileVisualizer.UIRegisterPanel.WeButton.interactable = false;
 
@@ -125,10 +125,10 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
         registerA3Visualizer.UIRegisterPanel.WeButton.interactable = false;
         registerWd3Visualizer.UIRegisterPanel.WeButton.interactable = false;
 
-        aluVizualizer.uiController.FirstOperationButton.interactable = false;
-        aluVizualizer.uiController.SecondOperationButton.interactable = false;
-        aluVizualizer.uiController.ThirdOperationButton.interactable = false;
-        aluVizualizer.uiController.FourthOperationButton.interactable = false;
+        aluVisualizer.uiController.FirstOperationButton.interactable = false;
+        aluVisualizer.uiController.SecondOperationButton.interactable = false;
+        aluVisualizer.uiController.ThirdOperationButton.interactable = false;
+        aluVisualizer.uiController.FourthOperationButton.interactable = false;
     }
 
     protected override bool CheckWinCondition()
@@ -151,7 +151,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
             RegisterA3We = A3.WriteEnable,
             RegisterWd3We = Wd3.WriteEnable,
 
-            AluOperation = aluVizualizer.CurrentAluOperation,
+            AluOperation = aluVisualizer.CurrentAluOperation,
         };
     }
 
@@ -178,7 +178,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
         var a = RegisterFile.ReadData1;
         var b = RegisterFile.ReadData2;
 
-        Wd3.Input = Alu.Calculate(a, b, aluVizualizer.CurrentAluOperation);
+        Wd3.Input = Alu.Calculate(a, b, aluVisualizer.CurrentAluOperation);
         if (TickCounter - 1 >= 0)
         {
             RegisterFile.WriteAdress = TickStateValues[TickCounter - 1].RegisterA3Value;
@@ -198,7 +198,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
         RegisterFile.Clock();
     }
 
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         registerFileVisualizer.UIRegisterPanel.WeButton.interactable = true;
 
@@ -207,10 +207,10 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
         registerA3Visualizer.UIRegisterPanel.WeButton.interactable = true;
         registerWd3Visualizer.UIRegisterPanel.WeButton.interactable = true;
 
-        aluVizualizer.uiController.FirstOperationButton.interactable = true;
-        aluVizualizer.uiController.SecondOperationButton.interactable = true;
-        aluVizualizer.uiController.ThirdOperationButton.interactable = true;
-        aluVizualizer.uiController.FourthOperationButton.interactable = true;
+        aluVisualizer.uiController.FirstOperationButton.interactable = true;
+        aluVisualizer.uiController.SecondOperationButton.interactable = true;
+        aluVisualizer.uiController.ThirdOperationButton.interactable = true;
+        aluVisualizer.uiController.FourthOperationButton.interactable = true;
     }
 
     protected override IEnumerator ReverseBusVisualizations()
@@ -227,7 +227,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
 
             var a = 0;
             var b = 0;
-            if (SrcA.Output > 0 && SrcA.Output < 16)
+            if (SrcA.Output is > 0 and < 16)
                 a = RegisterFile.Registers[SrcA.Output];
 
             if (SrcB.Output > 0 & SrcB.Output < 16)
@@ -260,7 +260,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
 
             var a = 0;
             var b = 0;
-            if (SrcA.Output > 0 && SrcA.Output < 16)
+            if (SrcA.Output is > 0 and < 16)
                 a = RegisterFile.Registers[SrcA.Output];
             
             if(SrcB.Output > 0 & SrcB.Output < 16)
@@ -272,7 +272,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
 
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
-            busController.StartBusSignal(busController.busSegments[5], Alu.Calculate(a, b, aluVizualizer.CurrentAluOperation));
+            busController.StartBusSignal(busController.busSegments[5], Alu.Calculate(a, b, aluVisualizer.CurrentAluOperation));
 
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
@@ -284,7 +284,7 @@ public class ExtendedLevelSeven : BaseLevelRegisseur<ExtendedSevenLevelState>
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         InfoSrcARegister.Display("Register A1", $"{SrcA.Output}");
         InfoSrcBRegister.Display("Register A2", $"{SrcB.Output}");

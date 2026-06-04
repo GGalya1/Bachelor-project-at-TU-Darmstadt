@@ -99,7 +99,7 @@ public class LevelManager : MonoBehaviour
 
             if (nextData != null)
             {
-                FullProcessorRegiseur.Initial = (ProcessorInitialState)nextData;
+                FullProcessorRegisseur.Initial = (ProcessorInitialState)nextData;
 
                 StartCoroutine(LoadWithTransition(20));
             }

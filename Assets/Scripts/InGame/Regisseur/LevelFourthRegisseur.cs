@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelFourthRegisseur : LevelThirdRegisseur
@@ -6,7 +7,7 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
     protected override void OnLevelStart()
     {
         // Initialization of logical components
-        SrcA = new Register(0)
+        SrcA = new Register()
         {
             WriteEnable = true
         };
@@ -29,7 +30,7 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
         InfoDataMemory = registerOutputVisualizer.UIRegisterPanel;
         
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override bool CheckWinCondition()
@@ -40,37 +41,27 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
     protected override void HandleClockUpdate() {
         var path = multiplexerVisualizer.CurrentChosenMuxPath;
         int[] inputs = { SrcA.Output, SrcB.Output };
-        var res = 0;
 
         if (path == -1)
         {
             Debug.LogError("Multiplexer path not selected (-1). Data will be lost.");
         }
-        else if (path >= 0 && path <= 1)
+        else if (path is >= 0 and <= 1)
         {
-            res = Multiplexer.SelectNto1(inputs, path);
+            Multiplexer.SelectNto1(inputs, path);
         }
         else
         {
             Debug.LogError($"Multiplexer path {path} is an invalid value!");
         }
 
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizer and concrete objects
         SrcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         SrcB.WriteEnable = registerSrcBVisualizer.isWriteEnabled;
         DataIntructionMemory.MemoryWrite = registerOutputVisualizer.isWriteEnabled;
 
         // implementation
-        if (DataIntructionMemory.Memory.ContainsKey(SrcA.Output))
-        {
-            SrcB.Input = DataIntructionMemory.Memory[SrcA.Output];
-        }
-        else
-        {
-            SrcB.Input = 0;
-            // if(dataIntructionMemory.MemoryWrite)
-            //  XXX
-        }
+        SrcB.Input = DataIntructionMemory.Memory.GetValueOrDefault(SrcA.Output, 0);
 
         DataIntructionMemory.Address = SrcA.Output;
         DataIntructionMemory.WriteData = SrcB.Output;
@@ -115,9 +106,9 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
             busController.StartBusSignal(busController.busSegments[6], SrcA.Output);
 
             // should be after a short delay
-            if (DataIntructionMemory.Memory.ContainsKey(SrcA.Output))
+            if (DataIntructionMemory.Memory.TryGetValue(SrcA.Output, out var value))
             {
-                yield return StartCoroutine(DelayedSignal(busController.busSegments[1], DataIntructionMemory.Memory[SrcA.Output]));
+                yield return StartCoroutine(DelayedSignal(busController.busSegments[1], value));
             }
             else
             {
@@ -166,28 +157,25 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
         {
             busController.StartBusSignal(busController.busSegments[5], SrcA.Input, true);
 
-            if (TickStateValues[TickCounter] is LevelThreeState s)
-            {
+
                 var upperBusSignal = 0;
                 if (multiplexerVisualizer.CurrentChosenMuxPath == 0)
                 {
-                    upperBusSignal = s.RegisterPCValue;
+                    upperBusSignal = TickStateValues[TickCounter].RegisterPCValue;
                 }
                 else if (multiplexerVisualizer.CurrentChosenMuxPath == 1)
                 {
-                    upperBusSignal = s.RegisterInstrValue;
+                    upperBusSignal = TickStateValues[TickCounter].RegisterInstrValue;
                 }
                 yield return StartCoroutine(DelayedSignals(busController.busSegments[3], upperBusSignal, busController.busSegments[4], 4, true, true));
 
-                yield return StartCoroutine(DelayedSignals(busController.busSegments[7], s.RegisterInstrValue, busController.busSegments[2], s.RegisterInstrValue, true, true));
+                yield return StartCoroutine(DelayedSignals(busController.busSegments[7], TickStateValues[TickCounter].RegisterInstrValue, busController.busSegments[2], TickStateValues[TickCounter].RegisterInstrValue, true, true));
 
-                yield return StartCoroutine(DelayedSignals(busController.busSegments[6], s.RegisterPCValue, busController.busSegments[1], SrcB.Input, true, true));
-            }
+                yield return StartCoroutine(DelayedSignals(busController.busSegments[6], TickStateValues[TickCounter].RegisterPCValue, busController.busSegments[1], SrcB.Input, true, true));
 
-            if (TickStateValues[TickCounter] is LevelThreeState st)
-            {
-                yield return StartCoroutine(DelayedSignal(busController.busSegments[0], st.RegisterPCValue, true));
-            }
+
+
+                yield return StartCoroutine(DelayedSignal(busController.busSegments[0], TickStateValues[TickCounter].RegisterPCValue, true));
 
 
             CurrentBus--;

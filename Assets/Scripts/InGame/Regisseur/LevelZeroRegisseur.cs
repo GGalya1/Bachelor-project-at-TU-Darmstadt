@@ -59,7 +59,7 @@ public class LevelZeroRegisseur : BaseLevelRegisseur<LevelZeroState>
         _infoSrcBRegister = registerSrcBVisualizer.UIRegisterPanel;
         _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void ApplyState(LevelZeroState s)
@@ -130,7 +130,7 @@ public class LevelZeroRegisseur : BaseLevelRegisseur<LevelZeroState>
                 (s.OutputRegisterWE == output.WriteEnable);
     }*/
 
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         _infoSrcARegister.Display("Register 1", $"{_srcA.Output}");
         _infoSrcBRegister.Display("Register 2", $"{_srcB.Output}");
@@ -172,14 +172,14 @@ public class LevelZeroRegisseur : BaseLevelRegisseur<LevelZeroState>
     }
 
     #region
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
         registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = false;
         registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = false;
     }
 
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
         registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = true;

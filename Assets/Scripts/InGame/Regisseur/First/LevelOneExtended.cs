@@ -39,7 +39,7 @@ public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
             WriteEnable = true
         };
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void ApplyState(ExtendedFirstLevelState s) // "s" for state
@@ -59,14 +59,14 @@ public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
         }
     }
 
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = false;
 
-        SwitchMuxInteractables(false, upperMuxVisualizer);
-        SwitchMuxInteractables(false, middleMuxVisualizer);
-        SwitchMuxInteractables(false, downMuxVisualizer);
-        SwitchMuxInteractables(false, outputMuxVisualizer);
+        SwitchMuxInteractable(false, upperMuxVisualizer);
+        SwitchMuxInteractable(false, middleMuxVisualizer);
+        SwitchMuxInteractable(false, downMuxVisualizer);
+        SwitchMuxInteractable(false, outputMuxVisualizer);
     }
 
     protected override bool CheckWinCondition()
@@ -99,14 +99,14 @@ public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
         _output.Clock();
     }
 
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = true;
 
-        SwitchMuxInteractables(true, upperMuxVisualizer);
-        SwitchMuxInteractables(true, middleMuxVisualizer);
-        SwitchMuxInteractables(true, downMuxVisualizer);
-        SwitchMuxInteractables(true, outputMuxVisualizer);
+        SwitchMuxInteractable(true, upperMuxVisualizer);
+        SwitchMuxInteractable(true, middleMuxVisualizer);
+        SwitchMuxInteractable(true, downMuxVisualizer);
+        SwitchMuxInteractable(true, outputMuxVisualizer);
     }
 
     protected override IEnumerator ReverseBusVisualizations()
@@ -179,13 +179,13 @@ public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         _infoOutputRegister.Display("Register 1", $"{_output.Output}");
     }
 
     #region helpers
-    private void SwitchMuxInteractables(bool trigger, MultiplexerVisualizer target)
+    private static void SwitchMuxInteractable(bool trigger, MultiplexerVisualizer target)
     {
         target.UIController.FirstWayButton.interactable = trigger;
         target.UIController.SecondWayButton.interactable = trigger;

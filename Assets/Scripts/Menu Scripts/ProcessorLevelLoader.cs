@@ -7,7 +7,7 @@ public class ProcessorLevelLoader : MonoBehaviour
 
     public void OpenProcessorLevel(int idx)
     {
-        FullProcessorRegiseur.Initial = levelData;
+        FullProcessorRegisseur.Initial = levelData;
 
         menuController.OpenLevel(idx);
     }

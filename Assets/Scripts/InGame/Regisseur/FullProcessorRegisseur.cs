@@ -19,8 +19,8 @@ public struct ProcessorLevelState
 
     public int[] RegisterFieldValue;
 
-    public bool RegisterPcwe;
-    public bool RegisterOldPcwe;
+    public bool RegisterPCwe;
+    public bool RegisterOldPCwe;
     public bool RegisterInstrWe;
     public bool RegisterDataWe;
     public bool RegisterScrAwe;
@@ -44,7 +44,7 @@ public enum ExerciseTyp {
     JAL = 3,
 }
 
-public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
+public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
 {
     [FormerlySerializedAs("_registerPCVisualizer")]
     [Header("Precossor Specific Components")]
@@ -99,10 +99,10 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
     private Register _aluOutReg;
 
     private DataInstMemory _dataIntructionMemory;
-    protected RegisterFile RegisterFile;
+    private RegisterFile _registerFile;
 
 
-    protected int CurrentBus; // [0, 10]
+    private int _currentBus; // [0, 10]
 
     protected void Awake()
     {
@@ -114,36 +114,36 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         {
             WriteEnable = true
         };
-        _oldPC = new Register(0)
+        _oldPC = new Register()
         {
             WriteEnable = true
         };
-        _instructionReg = new Register(0)
+        _instructionReg = new Register()
         {
             WriteEnable = true
         };
-        _dataReg = new Register(0)
+        _dataReg = new Register()
         {
             WriteEnable = true
         };
-        _srcA = new Register(0)
+        _srcA = new Register()
         {
             WriteEnable = true
         };
-        _srcB = new Register(0)
+        _srcB = new Register()
         {
             WriteEnable = true
         };
-        _aluOutReg = new Register(0)
+        _aluOutReg = new Register()
         {
             WriteEnable = true
         };
 
-        RegisterFile = new RegisterFile
+        _registerFile = new RegisterFile
         {
             RegisterWriteEnable = true
         };
-        RegisterFile.InitializeRegisters(new [] { 0, 1, 39, 43, 5, 6, 8,
+        _registerFile.InitializeRegisters(new [] { 0, 1, 39, 43, 5, 6, 8,
                                                      40, 3, 39, 13, 56, 63, 20,
                                                      50, 51, 0, 12, 53, 65, 29,
                                                      60, 61, 0, 25, 54, 0, 28,
@@ -168,7 +168,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         _infoSrcBRegister = registerSrcBVisualizer.UIRegisterPanel;
         _infoAluOutRegister = registerAluOutVisualizer.UIRegisterPanel;
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void ApplyState(ProcessorLevelState s)
@@ -198,10 +198,10 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         };
 
         // noch Register File einfuegen
-        RegisterFile.InitializeRegisters(s.RegisterFieldValue);
+        _registerFile.InitializeRegisters(s.RegisterFieldValue);
 
-        _pc.WriteEnable = s.RegisterPcwe;
-        _oldPC.WriteEnable = s.RegisterOldPcwe;
+        _pc.WriteEnable = s.RegisterPCwe;
+        _oldPC.WriteEnable = s.RegisterOldPCwe;
         _instructionReg.WriteEnable = s.RegisterInstrWe;
         _dataReg.WriteEnable = s.RegisterDataWe;
         _srcA.WriteEnable = s.RegisterScrAwe;
@@ -228,7 +228,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         numberBlinker.Trigger();
     }
 
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         memoryVisualizer.UIRegisterPanel.WeButton.interactable = false;
         registerFileVisualizer.UIRegisterPanel.WeButton.interactable = false;
@@ -270,7 +270,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
     {
         if (Initial.aufgabeTyp == ExerciseTyp.REGISTER_FIELD)
         {
-            return RegisterFile.Registers[Initial.registerFieldAddressAnswer] == Initial.registerFieldValueAnswer;
+            return _registerFile.Registers[Initial.registerFieldAddressAnswer] == Initial.registerFieldValueAnswer;
         }
         else if (Initial.aufgabeTyp == ExerciseTyp.MEMORY)
         {
@@ -281,7 +281,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
             return _pc.Output == Initial.pcValueAnswer;
         }
         else if (Initial.aufgabeTyp == ExerciseTyp.JAL) {
-            return _pc.Output == Initial.pcValueAnswer && RegisterFile.Registers[Initial.registerFieldAddressAnswer] == Initial.registerFieldValueAnswer;
+            return _pc.Output == Initial.pcValueAnswer && _registerFile.Registers[Initial.registerFieldAddressAnswer] == Initial.registerFieldValueAnswer;
         }
         else {
             return false;
@@ -300,15 +300,15 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
             RegisterSrcBValue = _srcB.Output,
             RegisterAluOutValue = _aluOutReg.Output,
 
-            RegisterFieldValue = (int[])RegisterFile.Registers.Clone(),
+            RegisterFieldValue = (int[])_registerFile.Registers.Clone(),
 
             FirstMemoryValue = _dataIntructionMemory.Memory[0],
             SecondMemoryValue = _dataIntructionMemory.Memory[4],
             ThirdMemoryValue = _dataIntructionMemory.Memory[8],
             FourthMemoryValue = _dataIntructionMemory.Memory[12],
 
-            RegisterPcwe = _pc.WriteEnable,
-            RegisterOldPcwe = _oldPC.WriteEnable,
+            RegisterPCwe = _pc.WriteEnable,
+            RegisterOldPCwe = _oldPC.WriteEnable,
             RegisterInstrWe = _instructionReg.WriteEnable,
             RegisterDataWe = _dataReg.WriteEnable,
             RegisterScrAwe = _srcA.WriteEnable,
@@ -328,7 +328,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
 
     protected override void HandleClockUpdate()
     {
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizers and concrete objects
         _pc.WriteEnable = registerPCVisualizer.isWriteEnabled;
         _oldPC.WriteEnable = registerOldPCVisualizer.isWriteEnabled;
         _instructionReg.WriteEnable = registerIntructionVisualizer.isWriteEnabled;
@@ -337,18 +337,18 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         _srcB.WriteEnable = registerSrcBVisualizer.isWriteEnabled;
         _aluOutReg.WriteEnable = registerAluOutVisualizer.isWriteEnabled;
         _dataIntructionMemory.MemoryWrite = memoryVisualizer.isWriteEnabled;
-        RegisterFile.RegisterWriteEnable = registerFileVisualizer.isWriteEnabled;
+        _registerFile.RegisterWriteEnable = registerFileVisualizer.isWriteEnabled;
 
 
 
         // implementation
 
         #region first step (memory)
-        var tmpAdress = CalculateAdressMux();
-        if (_dataIntructionMemory.Memory.ContainsKey(tmpAdress))
+        var tmpAddress = CalculateAdressMux();
+        if (_dataIntructionMemory.Memory.ContainsKey(tmpAddress))
         {
-            _instructionReg.Input = _dataIntructionMemory.Memory[tmpAdress];
-            _dataReg.Input = _dataIntructionMemory.Memory[tmpAdress];
+            _instructionReg.Input = _dataIntructionMemory.Memory[tmpAddress];
+            _dataReg.Input = _dataIntructionMemory.Memory[tmpAddress];
         }
         else
         {
@@ -358,25 +358,25 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
 
         _oldPC.Input = _pc.Output;
 
-        _dataIntructionMemory.Address = tmpAdress;
+        _dataIntructionMemory.Address = tmpAddress;
         #endregion
 
         #region second step (register file)
 
         // A1: [19:15] (Register Source 1)
-        RegisterFile.ReadAdress1 = (_instructionReg.Output >> 15) & 0x1F;
+        _registerFile.ReadAdress1 = (_instructionReg.Output >> 15) & 0x1F;
 
         // A2: [24:20] (Register Source 2)
-        RegisterFile.ReadAdress2 = (_instructionReg.Output >> 20) & 0x1F;
+        _registerFile.ReadAdress2 = (_instructionReg.Output >> 20) & 0x1F;
 
-        RegisterFile.ReadRegisters();
+        _registerFile.ReadRegisters();
 
         //Debug.LogWarning($"This is tick {_tickCounter}. A1: {registerFile.ReadAdress1}, A2: {registerFile.ReadAdress2}, A3: {(temp >> 7) & 0x1F}. Command: {commandBuilder(temp)}");
 
         // A3: [11:7] (Register Destination / rd)
 
-        _srcA.Input = RegisterFile.ReadData1;
-        _srcB.Input = RegisterFile.ReadData2;
+        _srcA.Input = _registerFile.ReadData1;
+        _srcB.Input = _registerFile.ReadData2;
         #endregion
 
         #region third step (ALU)
@@ -387,12 +387,12 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         #region fourth step (WB)
         
         if (TickCounter - 2 >= 0) {
-            RegisterFile.WriteAdress = ((TickStateValues[TickCounter - 2].RegisterInstrValue >> 7) & 0x1F);
-            RegisterFile.WriteData = TickStateValues[TickCounter - 2].RegisterInstrValue;
+            _registerFile.WriteAdress = ((TickStateValues[TickCounter - 2].RegisterInstrValue >> 7) & 0x1F);
+            _registerFile.WriteData = TickStateValues[TickCounter - 2].RegisterInstrValue;
         }
 
         var tmpResult = CalculateResultMux();
-        RegisterFile.WriteData = tmpResult;
+        _registerFile.WriteData = tmpResult;
         _pc.Input = tmpResult;
         #endregion
 
@@ -413,9 +413,9 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         _srcB.Clock();
         _aluOutReg.Clock();
         _dataIntructionMemory.Clock();
-        RegisterFile.Clock();
+        _registerFile.Clock();
     }
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         memoryVisualizer.UIRegisterPanel.WeButton.interactable = true;
         registerFileVisualizer.UIRegisterPanel.WeButton.interactable = true;
@@ -440,9 +440,9 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
 
     protected override IEnumerator RunBusVisualizations()
     {
-        if (CurrentBus >= 0 && CurrentBus < maxTickNumber)
+        if (_currentBus >= 0 && _currentBus < maxTickNumber)
         {
-            switch (CurrentBus % 4)
+            switch (_currentBus % 4)
             {
                 case 0: yield return RunFetchVisualisation(); break;
                 case 1: yield return RunDecodeVisualisation(); break;
@@ -450,7 +450,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
                 case 3: yield return RunWriteBackVizualization(); break;
             }
 
-            CurrentBus++;
+            _currentBus++;
         }
 
         yield return new WaitUntil(() => busController.NoActiveSignals);
@@ -465,12 +465,12 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         var muxSrcA = CalculateSrcAMux();
         var muxSrcB = CalculateSrcBMux();
         var output = CalculateResultMux();
-        var adressValue = CalculateAdressMux();
+        var addressValue = CalculateAdressMux();
 
-        yield return StartCoroutine(DelayedSignal(busController.busSegments[11], adressValue));
+        yield return StartCoroutine(DelayedSignal(busController.busSegments[11], addressValue));
 
         // ob Value existiert
-        if (_dataIntructionMemory.Memory.TryGetValue(adressValue, out var value)) {
+        if (_dataIntructionMemory.Memory.TryGetValue(addressValue, out var value)) {
             yield return StartCoroutine(DelayedSignal(busController.busSegments[12], value));
         }
         else
@@ -630,9 +630,9 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
 
     protected override IEnumerator ReverseBusVisualizations()
     {
-        if (CurrentBus >= 1 && CurrentBus <= maxTickNumber)
+        if (_currentBus >= 1 && _currentBus <= maxTickNumber)
         {
-            switch ((CurrentBus - 1) % 4)
+            switch ((_currentBus - 1) % 4)
             {
                 case 0: yield return ReverseFetchVisualisation(); break;
                 case 1: yield return ReverseDecodeVisualisation(); break;
@@ -640,13 +640,13 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
                 case 3: yield return ReverseWriteBackVisualisation(); break;
             }
 
-            CurrentBus--;
+            _currentBus--;
         }
 
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         UpdateSidePanel();
 
@@ -664,7 +664,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
             CommandBuilder((uint)_dataIntructionMemory.Memory[8]),
             CommandBuilder((uint)_dataIntructionMemory.Memory[12])
         );
-        registerFileVisualizer.UIRegisterPanel.Display(RegisterFile.Registers);
+        registerFileVisualizer.UIRegisterPanel.Display(_registerFile.Registers);
 
 
         // ==============================  WE SECTION  =====================================
@@ -676,7 +676,7 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         registerSrcBVisualizer.ForceUpdateWriteEnableVisualization(_srcB.WriteEnable);
         registerAluOutVisualizer.ForceUpdateWriteEnableVisualization(_aluOutReg.WriteEnable);
 
-        registerFileVisualizer.ForceUpdateWriteEnableVisualization(RegisterFile.RegisterWriteEnable);
+        registerFileVisualizer.ForceUpdateWriteEnableVisualization(_registerFile.RegisterWriteEnable);
         memoryVisualizer.ForceUpdateWriteEnableVisualization(_dataIntructionMemory.MemoryWrite);
     }
 
@@ -759,8 +759,6 @@ public class FullProcessorRegiseur : BaseLevelRegisseur<ProcessorLevelState>
         else
         {
             sidePanelInformer.SetStateInfo((int)StateName.UNKNOWN);
-            // Debug.LogWarning($"pc: {_pc.Output} | mem: {_dataIntructionMemory.Memory[_pc.Output] > 1000000} | isDa: {_dataIntructionMemory.Memory.ContainsKey(_pc.Output)}");
-            // Debug.LogError($"instruction reg: {_instructionReg.Output}");
         }
     }
 

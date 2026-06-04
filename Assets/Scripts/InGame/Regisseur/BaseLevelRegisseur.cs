@@ -53,10 +53,10 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
     // --- STATE ---
     protected int TickCounter;
     protected TState[] TickStateValues;
-    public int falledTries; // Public for debugging
+    [FormerlySerializedAs("falledTries")] public int fallenTries; // Public for debugging
 
     [FormerlySerializedAs("_busController")]
-    [Header("Bus Vizualization")]
+    [Header("Bus Visualisation")]
     [SerializeField] protected BusController busController;
     [FormerlySerializedAs("_isProcessing")] public bool isProcessing;
 
@@ -74,10 +74,10 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
     /// <summary> Visually indicates when a tick is triggered (e.g., flashing registers). </summary>
     protected abstract void BlinkClockedComponents();
 
-    /// <summary> Blocks all interactive elements to avoid confusion during signal visualization (WE-buttons etc). </summary>
-    protected abstract void BlockIngameInteractables();
+    /// <summary> Blocks all interactive elements to avoid confusion during signal visualization (WE-buttons etc.). </summary>
+    protected abstract void BlockInGameInteractable();
 
-    protected abstract void ReleaseIngameInteractables();
+    protected abstract void ReleaseInGameInteractable();
     #endregion
 
     /// <summary> 
@@ -126,7 +126,7 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
         isProcessing = true;
         nextClick.interactable = false; // Visually disable the buttons
         prevClick.interactable = false;
-        BlockIngameInteractables();
+        BlockInGameInteractable();
 
         BlinkClockedComponents();
 
@@ -137,7 +137,7 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
 
         TickCounter++;
         currentTickText.text = $"{TickCounter}";
-        UpdateVizualizers();
+        UpdateVisualizers();
 
         // The Logic of History
         var idx = TickCounter;
@@ -151,7 +151,7 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
         isProcessing = false;
         nextClick.interactable = true;
         prevClick.interactable = true;
-        ReleaseIngameInteractables();
+        ReleaseInGameInteractable();
     }
 
     private void HandlePrevTick()
@@ -164,7 +164,7 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
         isProcessing = true;
         nextClick.interactable = false;
         prevClick.interactable = false;
-        BlockIngameInteractables();
+        BlockInGameInteractable();
 
         TickCounter--;
         currentTickText.text = $"{TickCounter}";
@@ -173,12 +173,12 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
         yield return StartCoroutine(ReverseBusVisualizations());
 
         ApplyState(TickStateValues[TickCounter]);
-        UpdateVizualizers();
+        UpdateVisualizers();
 
         isProcessing = false;
         nextClick.interactable = true;
         prevClick.interactable = true;
-        ReleaseIngameInteractables();
+        ReleaseInGameInteractable();
     }
 
     protected virtual void CheckSolution()
@@ -196,14 +196,14 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
                 Debug.Log($"New level unlocked: Scene Index {nextLevelToUnlockIndex}");
             }
 
-            var earnedStars = CalculateStars(falledTries);
+            var earnedStars = CalculateStars(fallenTries);
             levelManager.SetGainedStars(earnedStars);
             levelManager.OpenEndOfLevelMenu();
         }
         else
         {
-            falledTries++;
-            Debug.LogError("Level is not solved! Failed tries: " + falledTries);
+            fallenTries++;
+            Debug.LogError("Level is not solved! Failed tries: " + fallenTries);
 
             StartCoroutine(ShowIncorrectIndicator());
         }
@@ -237,14 +237,14 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
     protected abstract bool CheckWinCondition();
 
     #region HISTORY METHODS
-    protected void SaveCurrentStateAt(int idx)
+    private void SaveCurrentStateAt(int idx)
     {
         TickStateValues[idx] = GetCurrentState();
     }
 
-    protected abstract void UpdateVizualizers();
+    protected abstract void UpdateVisualizers();
 
-    protected int CalculateStars(int tries)
+    private int CalculateStars(int tries)
     {
         if (tries <= threeStarCondition) return 3;
         if (tries <= twoStarCondition) return 2;

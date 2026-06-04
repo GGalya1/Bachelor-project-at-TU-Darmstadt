@@ -11,9 +11,10 @@ public struct LevelTwoState
 
 public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
 {
+    [FormerlySerializedAs("aluVisualizer")]
     [FormerlySerializedAs("_aluVizualizer")]
     [Header("Level 2 Specific Components")]
-    [SerializeField] private AluVisualiser aluVizualizer;
+    [SerializeField] private AluVisualiser aluVisualizer;
     [FormerlySerializedAs("_registerSrcAVisualizer")] [SerializeField] private RegisterVisualizer registerSrcAVisualizer;
     [FormerlySerializedAs("_numberBlinker")] [SerializeField] private Blinker numberBlinker;
 
@@ -37,7 +38,7 @@ public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
 
         _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void ApplyState(LevelTwoState s)
@@ -47,7 +48,7 @@ public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
             WriteEnable = s.RegisterAwe
         };
 
-        aluVizualizer.ChooseAluOperation(s.AluOperation);
+        aluVisualizer.ChooseAluOperation(s.AluOperation);
     }
 
     protected override void BlinkClockedComponents()
@@ -67,30 +68,21 @@ public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
         {
             RegisterAValue = _srcA.Output,
             RegisterAwe = _srcA.WriteEnable,
-            AluOperation = aluVizualizer.CurrentAluOperation,
+            AluOperation = aluVisualizer.CurrentAluOperation,
         };
     }
 
     protected override void HandleClockUpdate()
     {
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizers and concrete objects
         _srcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
 
-        _srcA.Input = Alu.Calculate(_srcA.Output, 4, aluVizualizer.CurrentAluOperation);
+        _srcA.Input = Alu.Calculate(_srcA.Output, 4, aluVisualizer.CurrentAluOperation);
         _srcA.PreClockUpdate();
         _srcA.Clock();
     }
 
-    /*protected override bool IsStateEqual(object state)
-    {
-        if (!(state is LevelTwoState s)) return false;
-
-        return (s.RegisterAValue == srcA.Output) && 
-            (s.RegisterAWE == srcA.WriteEnable) &&
-            (s.ALUOperation == _aluVizualizer.CurrentALUOperation);
-    }*/
-
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         _infoSrcARegister.Display("Register 1", $"{_srcA.Output}");
 
@@ -100,14 +92,14 @@ public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
     #region busVizualisation
     protected override IEnumerator RunBusVisualizations()
     {
-        if (_currentBus >= 0 && _currentBus < 5)
+        if (_currentBus is >= 0 and < 5)
         {
             busController.StartBusSignal(busController.busSegments[0], _srcA.Output);
             busController.StartBusSignal(busController.busSegments[1], 4);
 
             yield return StartCoroutine(DelayedSignal(
                 busController.busSegments[2],
-                Alu.Calculate(_srcA.Output, 4, aluVizualizer.CurrentAluOperation)
+                Alu.Calculate(_srcA.Output, 4, aluVisualizer.CurrentAluOperation)
             ));
 
             _currentBus++;
@@ -136,24 +128,24 @@ public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
     #endregion
 
     #region
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
 
-        aluVizualizer.uiController.FirstOperationButton.interactable = false;
-        aluVizualizer.uiController.SecondOperationButton.interactable = false;
-        aluVizualizer.uiController.ThirdOperationButton.interactable = false;
-        aluVizualizer.uiController.FourthOperationButton.interactable = false;
+        aluVisualizer.uiController.FirstOperationButton.interactable = false;
+        aluVisualizer.uiController.SecondOperationButton.interactable = false;
+        aluVisualizer.uiController.ThirdOperationButton.interactable = false;
+        aluVisualizer.uiController.FourthOperationButton.interactable = false;
     }
 
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
 
-        aluVizualizer.uiController.FirstOperationButton.interactable = true;
-        aluVizualizer.uiController.SecondOperationButton.interactable = true;
-        aluVizualizer.uiController.ThirdOperationButton.interactable = true;
-        aluVizualizer.uiController.FourthOperationButton.interactable = true;
+        aluVisualizer.uiController.FirstOperationButton.interactable = true;
+        aluVisualizer.uiController.SecondOperationButton.interactable = true;
+        aluVisualizer.uiController.ThirdOperationButton.interactable = true;
+        aluVisualizer.uiController.FourthOperationButton.interactable = true;
     }
     #endregion
 }

@@ -19,7 +19,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
     [Header("Level 5 (Extended) Specific Components")]
     [SerializeField] private RegisterVisualizer registerSrcAVisualizer;
     [FormerlySerializedAs("_registerOutputVisualizer")] [SerializeField] private RegisterVisualizer registerOutputVisualizer;
-    [FormerlySerializedAs("_extenderVizualizer")] [SerializeField] private ExtenderVisualizer extenderVizualizer;
+    [FormerlySerializedAs("extenderVizualizer")] [FormerlySerializedAs("_extenderVizualizer")] [SerializeField] private ExtenderVisualizer extenderVisualizer;
 
     [FormerlySerializedAs("InputRegisterValue")] [SerializeField] private uint inputRegisterValue;
 
@@ -39,7 +39,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         {
             WriteEnable = true
         };
-        _output = new Register(0)
+        _output = new Register()
         {
             WriteEnable = true
         };
@@ -47,7 +47,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
         _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void ApplyState(LevelFiveExtendedState s)
@@ -58,7 +58,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         _srcA.WriteEnable = s.RegisterWe;
         _output.WriteEnable = s.RegisterOutputWe;
 
-        extenderVizualizer.ChooseAluOperation(s.ExtenderOperation);
+        extenderVisualizer.ChooseAluOperation(s.ExtenderOperation);
     }
 
     protected override void BlinkClockedComponents()
@@ -67,15 +67,15 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         registerOutputVisualizer.TriggerBlink();
     }
 
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
         registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = false;
 
-        extenderVizualizer.uiController.FirstOperationButton.interactable = false;
-        extenderVizualizer.uiController.SecondOperationButton.interactable = false;
-        extenderVizualizer.uiController.ThirdOperationButton.interactable = false;
-        extenderVizualizer.uiController.FourthOperationButton.interactable = false;
+        extenderVisualizer.uiController.FirstOperationButton.interactable = false;
+        extenderVisualizer.uiController.SecondOperationButton.interactable = false;
+        extenderVisualizer.uiController.ThirdOperationButton.interactable = false;
+        extenderVisualizer.uiController.FourthOperationButton.interactable = false;
     }
 
     protected override bool CheckWinCondition()
@@ -93,7 +93,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
             RegisterWe = _srcA.WriteEnable,
             RegisterOutputWe = _output.WriteEnable,
 
-            ExtenderOperation = extenderVizualizer.CurrentAluOperation,
+            ExtenderOperation = extenderVisualizer.CurrentAluOperation,
         };
     }
 
@@ -103,7 +103,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         _srcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         _output.WriteEnable = registerOutputVisualizer.isWriteEnabled;
 
-        _output.Input = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)_srcA.Output);
+        _output.Input = Extender.Evaluate(extenderVisualizer.CurrentAluOperation, (uint)_srcA.Output);
 
 
         _srcA.PreClockUpdate();
@@ -113,28 +113,15 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         _output.Clock();
     }
 
-    /*protected override bool IsStateEqual(object state)
-    {
-        if (!(state is LevelFiveExtendedState s)) return false;
-
-        return (s.RegisterValue == srcA.Output) &&
-                (s.RegisterOutputValue == output.Output) &&
-
-                (s.RegisterWE == srcA.WriteEnable) &&
-                (s.RegisterOutputWE == output.WriteEnable) &&
-
-                (s.ExtenderOperation == _extenderVizualizer.CurrentALUOperation);
-    }*/
-
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
         registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = true;
 
-        extenderVizualizer.uiController.FirstOperationButton.interactable = true;
-        extenderVizualizer.uiController.SecondOperationButton.interactable = true;
-        extenderVizualizer.uiController.ThirdOperationButton.interactable = true;
-        extenderVizualizer.uiController.FourthOperationButton.interactable = true;
+        extenderVisualizer.uiController.FirstOperationButton.interactable = true;
+        extenderVisualizer.uiController.SecondOperationButton.interactable = true;
+        extenderVisualizer.uiController.ThirdOperationButton.interactable = true;
+        extenderVisualizer.uiController.FourthOperationButton.interactable = true;
     }
 
     protected override IEnumerator ReverseBusVisualizations()
@@ -152,7 +139,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         _infoSrcARegister.Display("Register 1", CommandBuilder((uint)_srcA.Output));
         _infoOutputRegister.Display("Register 2", $"{_output.Output}");

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -77,7 +78,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
         InfoDataMemory = registerOutputVisualizer.UIRegisterPanel;
        
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void ApplyState(LevelThreeState s)
@@ -145,7 +146,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
         {
             Debug.LogError("Multiplexer path not selected (-1). Data will be lost.");
         }
-        else if (path >= 0 && path <= 1)
+        else if (path is >= 0 and <= 1)
         {
             Multiplexer.SelectNto1(inputs, path);
         }
@@ -160,29 +161,26 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
         DataIntructionMemory.MemoryWrite = registerOutputVisualizer.isWriteEnabled;
 
         // implementation
-        if (DataIntructionMemory.Memory.ContainsKey(SrcA.Output))
-        {
-            SrcB.Input = DataIntructionMemory.Memory[SrcA.Output];
-        }
-        else {
-            SrcB.Input = 0;
-        }
+        SrcB.Input = DataIntructionMemory.Memory.GetValueOrDefault(SrcA.Output, 0);
         
 
         var p = multiplexerVisualizer.CurrentChosenMuxPath;
-        if (p == -1) {
-            Debug.LogError("MUX path is -1. No value will be propagated");
-            SrcA.Input = 0;
-        }
-        else if (p == 0) {
-            SrcA.Input = Alu.Calculate(SrcA.Output, 4, aluVizualizer.CurrentAluOperation);
-        }
-        else if (p == 1) {
-            SrcA.Input = Alu.Calculate(SrcB.Output, 4, aluVizualizer.CurrentAluOperation);
-        }
-        else {
-            Debug.LogError($"MUX path is incorrect! Expected [-1, 1] but got {p}");
-            SrcA.Input = 0;
+        switch (p)
+        {
+            case -1:
+                Debug.LogError("MUX path is -1. No value will be propagated");
+                SrcA.Input = 0;
+                break;
+            case 0:
+                SrcA.Input = Alu.Calculate(SrcA.Output, 4, aluVizualizer.CurrentAluOperation);
+                break;
+            case 1:
+                SrcA.Input = Alu.Calculate(SrcB.Output, 4, aluVizualizer.CurrentAluOperation);
+                break;
+            default:
+                Debug.LogError($"MUX path is incorrect! Expected [-1, 1] but got {p}");
+                SrcA.Input = 0;
+                break;
         }
         
         
@@ -223,26 +221,24 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
         {
             busController.StartBusSignal(busController.busSegments[5], SrcA.Input, true);
 
-            if (TickStateValues[TickCounter] is LevelThreeState s)
-            {
+
                 var upperBusSignal = 0;
                 if (multiplexerVisualizer.CurrentChosenMuxPath == 0) {
-                    upperBusSignal = s.RegisterPCValue;
+                    upperBusSignal = TickStateValues[TickCounter].RegisterPCValue;
                 }
                 else if (multiplexerVisualizer.CurrentChosenMuxPath == 1) {
-                    upperBusSignal = s.RegisterInstrValue;
+                    upperBusSignal = TickStateValues[TickCounter].RegisterInstrValue;
                 }
                 yield return StartCoroutine(DelayedSignals(busController.busSegments[3], upperBusSignal, busController.busSegments[4], 4, true, true));
 
-                yield return StartCoroutine(DelayedSignals(busController.busSegments[6], s.RegisterPCValue, busController.busSegments[2], s.RegisterInstrValue, true, true));
-            }
+                yield return StartCoroutine(DelayedSignals(busController.busSegments[6], TickStateValues[TickCounter].RegisterPCValue, busController.busSegments[2], TickStateValues[TickCounter].RegisterInstrValue, true, true));
+            
 
             yield return StartCoroutine(DelayedSignal(busController.busSegments[1], SrcB.Input, true));
 
-            if (TickStateValues[TickCounter] is LevelThreeState st)
-            {
-                yield return StartCoroutine(DelayedSignal(busController.busSegments[0], st.RegisterPCValue, true));
-            }
+
+                yield return StartCoroutine(DelayedSignal(busController.busSegments[0], TickStateValues[TickCounter].RegisterPCValue, true));
+            
             
 
             CurrentBus--;
@@ -259,9 +255,9 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
             busController.StartBusSignal(busController.busSegments[6], SrcA.Output);
 
             // should be by a short divisor
-            if (DataIntructionMemory.Memory.ContainsKey(SrcA.Output))
+            if (DataIntructionMemory.Memory.TryGetValue(SrcA.Output, out var value))
             {
-                yield return StartCoroutine(DelayedSignal(busController.busSegments[1], DataIntructionMemory.Memory[SrcA.Output]));
+                yield return StartCoroutine(DelayedSignal(busController.busSegments[1], value));
             }
             else {
                 yield return StartCoroutine(DelayedSignal(busController.busSegments[1], 0));
@@ -304,7 +300,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         InfoSrcARegister.Display("Register 1", $"{SrcA.Output}");
         InfoSrcBRegister.Display("Register 2", $"{SrcB.Output}");
@@ -316,7 +312,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
     }
 
     #region
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
         registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = false;
@@ -333,7 +329,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
         aluVizualizer.uiController.FourthOperationButton.interactable = false;
     }
 
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
         registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = true;

@@ -12,7 +12,7 @@ public struct LevelOneState
     public bool RegisterBwe;
     public bool OutputRegisterWe;
 
-    public int CurrentChoosenMuxPath;
+    public int CurrentChosenMuxPath;
 }
 
 public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
@@ -50,7 +50,7 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
         {
             WriteEnable = true
         };
-        _output = new Register(0)
+        _output = new Register()
         {
             WriteEnable = true
         };
@@ -60,7 +60,7 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
         _infoSrcBRegister = registerSrcBVisualizer.UIRegisterPanel;
         _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void BlinkClockedComponents()
@@ -76,7 +76,7 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
             RegisterAValue = _srcA.Output,
             RegisterBValue = _srcB.Output,
             OutputRegisterValue = _output.Output,
-            CurrentChoosenMuxPath = multiplexerVisualizer.CurrentChosenMuxPath,
+            CurrentChosenMuxPath = multiplexerVisualizer.CurrentChosenMuxPath,
             RegisterAwe = _srcA.WriteEnable,
             RegisterBwe = _srcB.WriteEnable,
             OutputRegisterWe = _output.WriteEnable
@@ -91,9 +91,9 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
         _srcB.WriteEnable = s.RegisterBwe;
         _output.WriteEnable = s.OutputRegisterWe;
         
-        ApplyMuxState(s.CurrentChoosenMuxPath, multiplexerVisualizer);
+        ApplyMuxState(s.CurrentChosenMuxPath, multiplexerVisualizer);
     }
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         _infoSrcARegister.Display("Register 1", $"{_srcA.Output}");
         _infoSrcBRegister.Display("Register 2", $"{_srcB.Output}");
@@ -110,16 +110,17 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
         int[] inputs = { _srcA.Output, _srcB.Output };
         var res = 0;
         
-        if (path == -1)
+        switch (path)
         {
-            Debug.LogError("Multiplexer path not selected (-1). Data will be lost.");
-        }
-        else if (path >= 0 && path <= 1)
-        {
-            res = Multiplexer.SelectNto1(inputs, path);
-        }
-        else {
-            Debug.LogError($"Multiplexer path {path} is an invalid value!");
+            case -1:
+                Debug.LogError("Multiplexer path not selected (-1). Data will be lost.");
+                break;
+            case >= 0 and <= 1:
+                res = Multiplexer.SelectNto1(inputs, path);
+                break;
+            default:
+                Debug.LogError($"Multiplexer path {path} is an invalid value!");
+                break;
         }
 
         // sinchronyse vizualisers and concrete objects
@@ -196,11 +197,11 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
         yield return new WaitUntil(() => busController.NoActiveSignals);
 
     }
-    IEnumerator DelayedBusSignal(LineRenderer busToStart)
+    private IEnumerator DelayedBusSignal(LineRenderer busToStart)
     {
         yield return new WaitUntil(() => busController.NoActiveSignals);
 
-        // Ssending the third signal
+        // sending the third signal
         var propagationVal = 0;
         if (multiplexerVisualizer.CurrentChosenMuxPath == 0)
         {
@@ -225,7 +226,7 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
     }
 
     #region
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
         registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = false;
@@ -236,7 +237,7 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
         multiplexerVisualizer.UIController.SecondWayButton.interactable = false;
     }
 
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
         registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = true;

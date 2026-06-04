@@ -30,10 +30,10 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
     [FormerlySerializedAs("_registerA3Visualizer")] [SerializeField] protected RegisterVisualizer registerA3Visualizer;
     [FormerlySerializedAs("_registerWD3Visualizer")] [SerializeField] protected RegisterVisualizer registerWd3Visualizer;
 
-    [FormerlySerializedAs("_aluVizualizer")] [SerializeField] protected AluVisualiser aluVizualizer;
+    [FormerlySerializedAs("aluVizualizer")] [FormerlySerializedAs("_aluVizualizer")] [SerializeField] protected AluVisualiser aluVisualizer;
 
     [FormerlySerializedAs("_registerFileVisualizer")] [SerializeField] protected RegisterFileVisualizer registerFileVisualizer;
-    [FormerlySerializedAs("_extenderVizualizer")] [SerializeField] private ExtenderVisualizer extenderVizualizer;
+    [FormerlySerializedAs("extenderVizualizer")] [FormerlySerializedAs("_extenderVizualizer")] [SerializeField] private ExtenderVisualizer extenderVisualizer;
     [FormerlySerializedAs("_MUXVisualizer")] [SerializeField] private MultiplexerVisualizer muxVisualizer;
 
     #region CACHED UI REFERENCES
@@ -64,11 +64,11 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
         {
             WriteEnable = true
         };
-        A3 = new Register(0)
+        A3 = new Register()
         {
             WriteEnable = true
         };
-        Wd3 = new Register(0)
+        Wd3 = new Register()
         {
             WriteEnable = true
         };
@@ -89,7 +89,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
         InfoA3Register = registerA3Visualizer.UIRegisterPanel;
         InfoWd3Register = registerWd3Visualizer.UIRegisterPanel;
         
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void ApplyState(SubExtendedSevenLevelState s)
@@ -106,8 +106,8 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
         A3.WriteEnable = s.RegisterA3We;
         Wd3.WriteEnable = s.RegisterWd3We;
 
-        aluVizualizer.ChooseAluOperation(s.AluOperation);
-        extenderVizualizer.ChooseAluOperation(s.ExtenderOperation);
+        aluVisualizer.ChooseAluOperation(s.AluOperation);
+        extenderVisualizer.ChooseAluOperation(s.ExtenderOperation);
 
         ApplyMuxState(s.MuxPath, muxVisualizer);
     }
@@ -122,7 +122,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
         registerFileVisualizer.TriggerBlink();
     }
 
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
         registerImmediateVisualizer.UIRegisterPanel.WeButton.interactable = false;
@@ -131,15 +131,15 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
 
         registerFileVisualizer.UIRegisterPanel.WeButton.interactable = false;
 
-        aluVizualizer.uiController.FirstOperationButton.interactable = false;
-        aluVizualizer.uiController.SecondOperationButton.interactable = false;
-        aluVizualizer.uiController.ThirdOperationButton.interactable = false;
-        aluVizualizer.uiController.FourthOperationButton.interactable = false;
+        aluVisualizer.uiController.FirstOperationButton.interactable = false;
+        aluVisualizer.uiController.SecondOperationButton.interactable = false;
+        aluVisualizer.uiController.ThirdOperationButton.interactable = false;
+        aluVisualizer.uiController.FourthOperationButton.interactable = false;
 
-        extenderVizualizer.uiController.FirstOperationButton.interactable = false;
-        extenderVizualizer.uiController.SecondOperationButton.interactable = false;
-        extenderVizualizer.uiController.ThirdOperationButton.interactable = false;
-        extenderVizualizer.uiController.FourthOperationButton.interactable = false;
+        extenderVisualizer.uiController.FirstOperationButton.interactable = false;
+        extenderVisualizer.uiController.SecondOperationButton.interactable = false;
+        extenderVisualizer.uiController.ThirdOperationButton.interactable = false;
+        extenderVisualizer.uiController.FourthOperationButton.interactable = false;
 
         muxVisualizer.UIController.FirstWayButton.interactable = false;
         muxVisualizer.UIController.SecondWayButton.interactable = false;
@@ -167,9 +167,9 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
             RegisterA3We = A3.WriteEnable,
             RegisterWd3We = Wd3.WriteEnable,
 
-            AluOperation = aluVizualizer.CurrentAluOperation,
+            AluOperation = aluVisualizer.CurrentAluOperation,
 
-            ExtenderOperation = extenderVizualizer.CurrentAluOperation,
+            ExtenderOperation = extenderVisualizer.CurrentAluOperation,
 
             MuxPath = muxVisualizer.CurrentChosenMuxPath,
         };
@@ -194,10 +194,10 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
         var a = 0;
         if (SrcA.Output is > 0 and < 16)
             a = RegisterFile.Registers[SrcA.Output];
-        var ext = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)ImmValue.Output);
+        var ext = Extender.Evaluate(extenderVisualizer.CurrentAluOperation, (uint)ImmValue.Output);
         var muxVal = EvaluateMux(0, ext, -1, muxVisualizer.CurrentChosenMuxPath);
 
-        Wd3.Input = Alu.Calculate(a, muxVal, aluVizualizer.CurrentAluOperation);
+        Wd3.Input = Alu.Calculate(a, muxVal, aluVisualizer.CurrentAluOperation);
 
         if (TickCounter - 1 >= 0)
         {
@@ -222,7 +222,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
         RegisterFile.Clock();
     }
 
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
         registerImmediateVisualizer.UIRegisterPanel.WeButton.interactable = true;
@@ -231,15 +231,15 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
 
         registerFileVisualizer.UIRegisterPanel.WeButton.interactable = true;
 
-        aluVizualizer.uiController.FirstOperationButton.interactable = true;
-        aluVizualizer.uiController.SecondOperationButton.interactable = true;
-        aluVizualizer.uiController.ThirdOperationButton.interactable = true;
-        aluVizualizer.uiController.FourthOperationButton.interactable = true;
+        aluVisualizer.uiController.FirstOperationButton.interactable = true;
+        aluVisualizer.uiController.SecondOperationButton.interactable = true;
+        aluVisualizer.uiController.ThirdOperationButton.interactable = true;
+        aluVisualizer.uiController.FourthOperationButton.interactable = true;
 
-        extenderVizualizer.uiController.FirstOperationButton.interactable = true;
-        extenderVizualizer.uiController.SecondOperationButton.interactable = true;
-        extenderVizualizer.uiController.ThirdOperationButton.interactable = true;
-        extenderVizualizer.uiController.FourthOperationButton.interactable = true;
+        extenderVisualizer.uiController.FirstOperationButton.interactable = true;
+        extenderVisualizer.uiController.SecondOperationButton.interactable = true;
+        extenderVisualizer.uiController.ThirdOperationButton.interactable = true;
+        extenderVisualizer.uiController.FourthOperationButton.interactable = true;
 
         muxVisualizer.UIController.FirstWayButton.interactable = true;
         muxVisualizer.UIController.SecondWayButton.interactable = true;
@@ -256,7 +256,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
             busController.StartBusSignal(busController.busSegments[7], Wd3.Input, true);
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
-            var ext = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)ImmValue.Output);
+            var ext = Extender.Evaluate(extenderVisualizer.CurrentAluOperation, (uint)ImmValue.Output);
             var mux = EvaluateMux(0, ext, -1, muxVisualizer.CurrentChosenMuxPath);
 
             busController.StartBusSignal(busController.busSegments[3], RegisterFile.Registers[SrcA.Output], true);
@@ -290,7 +290,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
             if (SrcA.Output is > 0 and < 16)
                 a = RegisterFile.Registers[SrcA.Output];
 
-            var ext = Extender.Evaluate(extenderVizualizer.CurrentAluOperation, (uint)ImmValue.Output);
+            var ext = Extender.Evaluate(extenderVisualizer.CurrentAluOperation, (uint)ImmValue.Output);
             var mux = EvaluateMux(0, ext, -1, muxVisualizer.CurrentChosenMuxPath);
 
             busController.StartBusSignal(busController.busSegments[4], 0);
@@ -301,7 +301,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
             busController.StartBusSignal(busController.busSegments[6], mux);
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
-            busController.StartBusSignal(busController.busSegments[7], Alu.Calculate(a, mux, aluVizualizer.CurrentAluOperation));
+            busController.StartBusSignal(busController.busSegments[7], Alu.Calculate(a, mux, aluVisualizer.CurrentAluOperation));
 
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
@@ -313,7 +313,7 @@ public class SubExtendedRegisseur : BaseLevelRegisseur<SubExtendedSevenLevelStat
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         InfoSrcARegister.Display("Register A1", $"{SrcA.Output}");
         InfoImmRegister.Display("Register A2", CommandBuilder((uint)ImmValue.Output));

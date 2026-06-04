@@ -15,9 +15,10 @@ public struct LevelTwoExtendedState
 
 public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
 {
+    [FormerlySerializedAs("aluVisualizer")]
     [FormerlySerializedAs("_aluVizualizer")]
     [Header("Level 2 (Extender) Specific Components")]
-    [SerializeField] private AluVisualiser aluVizualizer;
+    [SerializeField] private AluVisualiser aluVisualizer;
     [FormerlySerializedAs("registerSrcAVizualizer")] [FormerlySerializedAs("_registerSrcAVizualizer")] [SerializeField] private RegisterVisualizer registerSrcAVisualizer;
     [FormerlySerializedAs("registerSrcBVizualizer")] [FormerlySerializedAs("_registerSrcBVizualizer")] [SerializeField] private RegisterVisualizer registerSrcBVisualizer;
     [FormerlySerializedAs("registerOutputVizualizer")] [FormerlySerializedAs("_registerOutputVizualizer")] [SerializeField] private RegisterVisualizer registerOutputVisualizer;
@@ -47,7 +48,7 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
         {
             WriteEnable = true
         };
-        _output = new Register(0)
+        _output = new Register()
         {
             WriteEnable = true
         };
@@ -56,7 +57,7 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
         _infoSrcBRegister = registerSrcBVisualizer.UIRegisterPanel;
         _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
 
-        UpdateVizualizers();
+        UpdateVisualizers();
     }
 
     protected override void ApplyState(LevelTwoExtendedState s)
@@ -76,7 +77,7 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
             WriteEnable = s.OutputWe
         };
 
-        aluVizualizer.ChooseAluOperation(s.AluOperation);
+        aluVisualizer.ChooseAluOperation(s.AluOperation);
     }
 
     protected override void BlinkClockedComponents()
@@ -86,16 +87,16 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
         registerOutputVisualizer.TriggerBlink();
     }
 
-    protected override void BlockIngameInteractables()
+    protected override void BlockInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
         registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = false;
         registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = false;
 
-        aluVizualizer.uiController.FirstOperationButton.interactable = false;
-        aluVizualizer.uiController.SecondOperationButton.interactable = false;
-        aluVizualizer.uiController.ThirdOperationButton.interactable = false;
-        aluVizualizer.uiController.FourthOperationButton.interactable = false;
+        aluVisualizer.uiController.FirstOperationButton.interactable = false;
+        aluVisualizer.uiController.SecondOperationButton.interactable = false;
+        aluVisualizer.uiController.ThirdOperationButton.interactable = false;
+        aluVisualizer.uiController.FourthOperationButton.interactable = false;
     }
 
     protected override bool CheckWinCondition()
@@ -113,18 +114,18 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
             RegisterBwe = _srcB.WriteEnable,
             OutputValue = _output.Output,
             OutputWe = _output.WriteEnable,
-            AluOperation = aluVizualizer.CurrentAluOperation,
+            AluOperation = aluVisualizer.CurrentAluOperation,
         };
     }
 
     protected override void HandleClockUpdate()
     {
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizers and concrete objects
         _srcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         _srcB.WriteEnable = registerSrcBVisualizer.isWriteEnabled;
         _output.WriteEnable = registerOutputVisualizer.isWriteEnabled;
 
-        _output.Input = Alu.Calculate(_srcA.Output, _srcB.Output, aluVizualizer.CurrentAluOperation);
+        _output.Input = Alu.Calculate(_srcA.Output, _srcB.Output, aluVisualizer.CurrentAluOperation);
         _srcA.PreClockUpdate();
         _srcB.PreClockUpdate();
         _output.PreClockUpdate();
@@ -134,29 +135,16 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
         _output.Clock();
     }
 
-    /*protected override bool IsStateEqual(object state)
-    {
-        if (!(state is LevelTwoExtendedState s)) return false;
-
-        return (s.RegisterAValue == srcA.Output) &&
-            (s.RegisterAWE == srcA.WriteEnable) &&
-            (s.RegisterBValue == srcB.Output) &&
-            (s.RegisterBWE == srcB.WriteEnable) &&
-            (s.OutputValue == output.Output) &&
-            (s.OutputWE == output.WriteEnable) &&
-            (s.ALUOperation == _aluVizualizer.CurrentALUOperation);
-    }*/
-
-    protected override void ReleaseIngameInteractables()
+    protected override void ReleaseInGameInteractable()
     {
         registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
         registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = true;
         registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = true;
 
-        aluVizualizer.uiController.FirstOperationButton.interactable = true;
-        aluVizualizer.uiController.SecondOperationButton.interactable = true;
-        aluVizualizer.uiController.ThirdOperationButton.interactable = true;
-        aluVizualizer.uiController.FourthOperationButton.interactable = true;
+        aluVisualizer.uiController.FirstOperationButton.interactable = true;
+        aluVisualizer.uiController.SecondOperationButton.interactable = true;
+        aluVisualizer.uiController.ThirdOperationButton.interactable = true;
+        aluVisualizer.uiController.FourthOperationButton.interactable = true;
     }
 
     protected override IEnumerator ReverseBusVisualizations()
@@ -184,14 +172,14 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
 
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
-            busController.StartBusSignal(busController.busSegments[2], Alu.Calculate(_srcA.Output, _srcB.Output, aluVizualizer.CurrentAluOperation));
+            busController.StartBusSignal(busController.busSegments[2], Alu.Calculate(_srcA.Output, _srcB.Output, aluVisualizer.CurrentAluOperation));
 
             _currentBus++;
         }
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
-    protected override void UpdateVizualizers()
+    protected override void UpdateVisualizers()
     {
         _infoSrcARegister.Display("Register 1", $"{_srcA.Output}");
         _infoSrcBRegister.Display("Register 2", $"{_srcB.Output}");
