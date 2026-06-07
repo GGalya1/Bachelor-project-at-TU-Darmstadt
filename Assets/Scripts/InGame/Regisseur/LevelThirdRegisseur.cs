@@ -17,7 +17,7 @@ public struct LevelThreeState
     public bool RegisterInstrWe;
     public bool IntrDataMemoryWe;
 
-    public int CurrentChoosenMuxPath; // since we can call ResetVisualization and, based on the selected path, call one of the Visualizer methods
+    public int CurrentChosenMuxPath; // since we can call ResetVisualization and, based on the selected path, call one of the Visualizer methods
     public int AluOperation;
 }
 
@@ -29,7 +29,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
     [FormerlySerializedAs("_registerSrcAVisualizer")] [SerializeField] protected RegisterVisualizer registerSrcAVisualizer;
     [FormerlySerializedAs("_registerSrcBVisualizer")] [SerializeField] protected RegisterVisualizer registerSrcBVisualizer;
     [FormerlySerializedAs("_registerOutputVisualizer")] [SerializeField] protected InstructionDataMemoryVisualizer registerOutputVisualizer;
-    [FormerlySerializedAs("_aluVizualizer")] [SerializeField] protected AluVisualiser aluVizualizer;
+    [FormerlySerializedAs("aluVizualizer")] [FormerlySerializedAs("_aluVizualizer")] [SerializeField] protected AluVisualiser aluVisualizer;
 
     [SerializeField] protected int srcAValue = 5;
     [SerializeField] protected int srcBValue = 7;
@@ -45,7 +45,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
     // Intern components for computations
     protected Register SrcA;
     protected Register SrcB;
-    protected DataInstMemory DataIntructionMemory;
+    protected DataInstMemory DataInstructionMemory;
 
     // protected override int RightAnswerValue => 66;
 
@@ -63,14 +63,14 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
         {
             WriteEnable = true
         };
-        DataIntructionMemory = new DataInstMemory
+        DataInstructionMemory = new DataInstMemory
         {
             MemoryWrite = true
         };
-        DataIntructionMemory.LoadWord(0, 256);
-        DataIntructionMemory.LoadWord(4, 128);
-        DataIntructionMemory.LoadWord(8, -89);
-        DataIntructionMemory.LoadWord(12, 66);
+        DataInstructionMemory.LoadWord(0, 256);
+        DataInstructionMemory.LoadWord(4, 128);
+        DataInstructionMemory.LoadWord(8, -89);
+        DataInstructionMemory.LoadWord(12, 66);
 
         // Caching of UI panels for visualizers
         InfoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
@@ -85,7 +85,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
     {
         SrcA = new Register(s.RegisterPCValue);
         SrcB = new Register(s.RegisterInstrValue);
-        DataIntructionMemory = new DataInstMemory
+        DataInstructionMemory = new DataInstMemory
         {
             Memory =
             {
@@ -98,9 +98,9 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
 
         SrcA.WriteEnable = s.RegisterPcwe;
         SrcB.WriteEnable = s.RegisterInstrWe;
-        DataIntructionMemory.MemoryWrite = s.IntrDataMemoryWe;
+        DataInstructionMemory.MemoryWrite = s.IntrDataMemoryWe;
 
-        ApplyMuxState(s.CurrentChoosenMuxPath, multiplexerVisualizer);
+        ApplyMuxState(s.CurrentChosenMuxPath, multiplexerVisualizer);
     }
 
     protected override void BlinkClockedComponents()
@@ -123,17 +123,17 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
             RegisterPCValue = SrcA.Output,
             RegisterInstrValue = SrcB.Output,
 
-            FirstMemoryValue = DataIntructionMemory.Memory[0],
-            SecondMemoryValue = DataIntructionMemory.Memory[4],
-            ThirdMemoryValue = DataIntructionMemory.Memory[8],
-            FourthMemoryValue = DataIntructionMemory.Memory[12],
+            FirstMemoryValue = DataInstructionMemory.Memory[0],
+            SecondMemoryValue = DataInstructionMemory.Memory[4],
+            ThirdMemoryValue = DataInstructionMemory.Memory[8],
+            FourthMemoryValue = DataInstructionMemory.Memory[12],
 
             RegisterPcwe = SrcA.WriteEnable,
             RegisterInstrWe = SrcB.WriteEnable,
-            IntrDataMemoryWe = DataIntructionMemory.MemoryWrite,
+            IntrDataMemoryWe = DataInstructionMemory.MemoryWrite,
 
-            CurrentChoosenMuxPath = multiplexerVisualizer.CurrentChosenMuxPath,
-            AluOperation = aluVizualizer.CurrentAluOperation,
+            CurrentChosenMuxPath = multiplexerVisualizer.CurrentChosenMuxPath,
+            AluOperation = aluVisualizer.CurrentAluOperation,
         };
     }
 
@@ -155,13 +155,13 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
             Debug.LogError($"Multiplexer path {path} is an invalid value!");
         }
 
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizers and concrete objects
         SrcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         SrcB.WriteEnable = registerSrcBVisualizer.isWriteEnabled;
-        DataIntructionMemory.MemoryWrite = registerOutputVisualizer.isWriteEnabled;
+        DataInstructionMemory.MemoryWrite = registerOutputVisualizer.isWriteEnabled;
 
         // implementation
-        SrcB.Input = DataIntructionMemory.Memory.GetValueOrDefault(SrcA.Output, 0);
+        SrcB.Input = DataInstructionMemory.Memory.GetValueOrDefault(SrcA.Output, 0);
         
 
         var p = multiplexerVisualizer.CurrentChosenMuxPath;
@@ -172,10 +172,10 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
                 SrcA.Input = 0;
                 break;
             case 0:
-                SrcA.Input = Alu.Calculate(SrcA.Output, 4, aluVizualizer.CurrentAluOperation);
+                SrcA.Input = Alu.Calculate(SrcA.Output, 4, aluVisualizer.CurrentAluOperation);
                 break;
             case 1:
-                SrcA.Input = Alu.Calculate(SrcB.Output, 4, aluVizualizer.CurrentAluOperation);
+                SrcA.Input = Alu.Calculate(SrcB.Output, 4, aluVisualizer.CurrentAluOperation);
                 break;
             default:
                 Debug.LogError($"MUX path is incorrect! Expected [-1, 1] but got {p}");
@@ -187,33 +187,14 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
 
         SrcA.PreClockUpdate();
         SrcB.PreClockUpdate();
-        DataIntructionMemory.PreClockUpdate();
+        DataInstructionMemory.PreClockUpdate();
 
 
         // Only if WriteEnable = true, call Clock
         SrcA.Clock();
         SrcB.Clock();
-        DataIntructionMemory.Clock();
+        DataInstructionMemory.Clock();
     }
-
-    /*protected override bool IsStateEqual(object state)
-    {
-        if (!(state is LevelThreeState s)) return false;
-
-        return (s.RegisterPCValue == srcA.Output) &&
-                (s.RegisterInstrValue == srcB.Output) &&
-
-                (s.firstMemoryValue == dataIntructionMemory._memory[0]) &&
-                (s.secondMemoryValue == dataIntructionMemory._memory[4]) &&
-                (s.thirdMemoryValue == dataIntructionMemory._memory[8]) &&
-                (s.fourthMemoryValue == dataIntructionMemory._memory[12]) &&
-
-                (s.CurrentChosenMuxPath == _multiplexerVisualizer.CurrentChosenMuxPath) &&
-                (s.RegisterPCWE == srcA.WriteEnable) &&
-                (s.RegisterInstrWE == srcB.WriteEnable) &&
-                (s.IntrDataMemoryWE == dataIntructionMemory.MemoryWrite) &&
-                (s.ALUOperation == _aluVizualizer.CurrentALUOperation);
-    }*/
 
     protected override IEnumerator ReverseBusVisualizations()
     {
@@ -255,7 +236,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
             busController.StartBusSignal(busController.busSegments[6], SrcA.Output);
 
             // should be by a short divisor
-            if (DataIntructionMemory.Memory.TryGetValue(SrcA.Output, out var value))
+            if (DataInstructionMemory.Memory.TryGetValue(SrcA.Output, out var value))
             {
                 yield return StartCoroutine(DelayedSignal(busController.busSegments[1], value));
             }
@@ -292,7 +273,7 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
 
 
             // from ALU to first register
-            yield return StartCoroutine(DelayedSignal(busController.busSegments[5], Alu.Calculate(propagationVal, 4, aluVizualizer.CurrentAluOperation)));
+            yield return StartCoroutine(DelayedSignal(busController.busSegments[5], Alu.Calculate(propagationVal, 4, aluVisualizer.CurrentAluOperation)));
 
             CurrentBus++;
         }
@@ -304,10 +285,10 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
     {
         InfoSrcARegister.Display("Register 1", $"{SrcA.Output}");
         InfoSrcBRegister.Display("Register 2", $"{SrcB.Output}");
-        registerOutputVisualizer.UIRegisterPanel.Display($"{DataIntructionMemory.Memory[0]}", $"{DataIntructionMemory.Memory[4]}", $"{DataIntructionMemory.Memory[8]}", $"{DataIntructionMemory.Memory[12]}");
+        registerOutputVisualizer.UIRegisterPanel.Display($"{DataInstructionMemory.Memory[0]}", $"{DataInstructionMemory.Memory[4]}", $"{DataInstructionMemory.Memory[8]}", $"{DataInstructionMemory.Memory[12]}");
 
         registerSrcAVisualizer.ForceUpdateWriteEnableVisualization(SrcA.WriteEnable);
         registerSrcBVisualizer.ForceUpdateWriteEnableVisualization(SrcB.WriteEnable);
-        registerOutputVisualizer.ForceUpdateWriteEnableVisualization(DataIntructionMemory.MemoryWrite);
+        registerOutputVisualizer.ForceUpdateWriteEnableVisualization(DataInstructionMemory.MemoryWrite);
     }
 }

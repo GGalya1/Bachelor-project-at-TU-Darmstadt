@@ -15,14 +15,14 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
         {
             WriteEnable = true
         };
-        DataIntructionMemory = new DataInstMemory
+        DataInstructionMemory = new DataInstMemory
         {
             MemoryWrite = true
         };
-        DataIntructionMemory.LoadWord(0, 0);
-        DataIntructionMemory.LoadWord(4, 3);
-        DataIntructionMemory.LoadWord(8, -256);
-        DataIntructionMemory.LoadWord(12, -1024);
+        DataInstructionMemory.LoadWord(0, 0);
+        DataInstructionMemory.LoadWord(4, 3);
+        DataInstructionMemory.LoadWord(8, -256);
+        DataInstructionMemory.LoadWord(12, -1024);
 
         // Caching of UI panels for visualizers
         InfoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
@@ -35,7 +35,7 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
 
     protected override bool CheckWinCondition()
     {
-        return DataIntructionMemory.Memory[0] < DataIntructionMemory.Memory[correctAnswer];
+        return DataInstructionMemory.Memory[0] < DataInstructionMemory.Memory[correctAnswer];
     }
 
     protected override void HandleClockUpdate() {
@@ -58,13 +58,13 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
         // synchronize visualizer and concrete objects
         SrcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         SrcB.WriteEnable = registerSrcBVisualizer.isWriteEnabled;
-        DataIntructionMemory.MemoryWrite = registerOutputVisualizer.isWriteEnabled;
+        DataInstructionMemory.MemoryWrite = registerOutputVisualizer.isWriteEnabled;
 
         // implementation
-        SrcB.Input = DataIntructionMemory.Memory.GetValueOrDefault(SrcA.Output, 0);
+        SrcB.Input = DataInstructionMemory.Memory.GetValueOrDefault(SrcA.Output, 0);
 
-        DataIntructionMemory.Address = SrcA.Output;
-        DataIntructionMemory.WriteData = SrcB.Output;
+        DataInstructionMemory.Address = SrcA.Output;
+        DataInstructionMemory.WriteData = SrcB.Output;
         
         var p = multiplexerVisualizer.CurrentChosenMuxPath;
         if (p == -1)
@@ -74,11 +74,11 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
         }
         else if (p == 0)
         {
-            SrcA.Input = Alu.Calculate(SrcA.Output, 4, aluVizualizer.CurrentAluOperation);
+            SrcA.Input = Alu.Calculate(SrcA.Output, 4, aluVisualizer.CurrentAluOperation);
         }
         else if (p == 1)
         {
-            SrcA.Input = Alu.Calculate(SrcB.Output, 4, aluVizualizer.CurrentAluOperation);
+            SrcA.Input = Alu.Calculate(SrcB.Output, 4, aluVisualizer.CurrentAluOperation);
         }
         else
         {
@@ -90,13 +90,13 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
 
         SrcA.PreClockUpdate();
         SrcB.PreClockUpdate();
-        DataIntructionMemory.PreClockUpdate();
+        DataInstructionMemory.PreClockUpdate();
 
 
         // Only if WriteEnable = true, call Clock
         SrcA.Clock();
         SrcB.Clock();
-        DataIntructionMemory.Clock();
+        DataInstructionMemory.Clock();
     }
 
     protected override IEnumerator RunBusVisualizations() {
@@ -106,7 +106,7 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
             busController.StartBusSignal(busController.busSegments[6], SrcA.Output);
 
             // should be after a short delay
-            if (DataIntructionMemory.Memory.TryGetValue(SrcA.Output, out var value))
+            if (DataInstructionMemory.Memory.TryGetValue(SrcA.Output, out var value))
             {
                 yield return StartCoroutine(DelayedSignal(busController.busSegments[1], value));
             }
@@ -145,7 +145,7 @@ public class LevelFourthRegisseur : LevelThirdRegisseur
 
 
             // from ALU to first register
-            yield return StartCoroutine(DelayedSignal(busController.busSegments[5], Alu.Calculate(propagationVal, 4, aluVizualizer.CurrentAluOperation)));
+            yield return StartCoroutine(DelayedSignal(busController.busSegments[5], Alu.Calculate(propagationVal, 4, aluVisualizer.CurrentAluOperation)));
 
             CurrentBus++;
         }

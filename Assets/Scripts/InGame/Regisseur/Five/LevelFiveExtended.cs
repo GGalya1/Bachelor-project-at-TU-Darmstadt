@@ -88,7 +88,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
 
     protected override void HandleClockUpdate()
     {
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizers and concrete objects
         _srcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         _output.WriteEnable = registerOutputVisualizer.isWriteEnabled;
 

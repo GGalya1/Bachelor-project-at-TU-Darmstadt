@@ -29,7 +29,7 @@ public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
     private Register _output;
     private InfoPanelUI _infoOutputRegister;
 
-    protected int CurrentBus; // [0, 2]
+    private int _currentBus; // [0, 2]
 
     protected override void OnLevelStart()
     {
@@ -91,7 +91,7 @@ public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
 
     protected override IEnumerator ReverseBusVisualizations()
     {
-        if (CurrentBus >= 1 && CurrentBus <= maxTickNumber)
+        if (_currentBus >= 1 && _currentBus <= maxTickNumber)
         {
             var up = upperMuxVisualizer.CurrentChosenMuxPath == 0 ? -4 : 0;
             var left = middleMuxVisualizer.CurrentChosenMuxPath == 0 ? 8 : 12;
@@ -116,7 +116,7 @@ public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
             busController.StartBusSignal(busController.busSegments[0], 8, true);
             busController.StartBusSignal(busController.busSegments[1], 12, true);
 
-            CurrentBus--;
+            _currentBus--;
         }
 
         yield return new WaitUntil(() => busController.NoActiveSignals);
@@ -124,7 +124,7 @@ public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
 
     protected override IEnumerator RunBusVisualizations()
     {
-        if (CurrentBus >= 0 && CurrentBus < maxTickNumber)
+        if (_currentBus >= 0 && _currentBus < maxTickNumber)
         {
             var up = EvaluateMux(upperMuxVisualizer.CurrentChosenMuxPath, -4, 0, -1);
             var left = EvaluateMux(middleMuxVisualizer.CurrentChosenMuxPath, 8, 12, -1);
@@ -153,7 +153,7 @@ public class LevelOneExtended : BaseLevelRegisseur<ExtendedFirstLevelState>
 
             busController.StartBusSignal(busController.busSegments[10], output);
 
-            CurrentBus++;
+            _currentBus++;
         }
 
         yield return new WaitUntil(() => busController.NoActiveSignals);
