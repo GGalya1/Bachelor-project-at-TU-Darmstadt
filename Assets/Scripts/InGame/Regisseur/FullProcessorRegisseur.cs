@@ -61,7 +61,7 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
     [FormerlySerializedAs("_srcBMUXVisualizer")] [SerializeField] private MultiplexerVisualizer srcBmuxVisualizer;
     [FormerlySerializedAs("_resultMUXVisualizer")] [SerializeField] private MultiplexerVisualizer resultMuxVisualizer;
 
-    [FormerlySerializedAs("aluVizualizer")] [FormerlySerializedAs("_aluVizualizer")] [SerializeField] private AluVisualiser aluVisualizer;
+    [FormerlySerializedAs("aluVisualizer")] [FormerlySerializedAs("_aluVizualizer")] [SerializeField] private AluVisualiser aluVisualizer;
     [FormerlySerializedAs("extenderVizualizer")] [FormerlySerializedAs("_extenderVizualizer")] [SerializeField] private ExtenderVisualizer extenderVisualizer;
 
     [FormerlySerializedAs("_memoryVisualizer")] [SerializeField] private InstructionDataMemoryVisualizer memoryVisualizer;
@@ -227,17 +227,6 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
         registerFileVisualizer.TriggerBlink();
 
         numberBlinker.Trigger();
-    }
-
-
-    private void SwitchInteractableAccessibility(bool trigger) {
-        registerPCVisualizer.UIRegisterPanel.WeButton.interactable = trigger;
-        registerOldPCVisualizer.UIRegisterPanel.WeButton.interactable = trigger;
-        registerInstructionVisualizer.UIRegisterPanel.WeButton.interactable = trigger;
-        registerDataVisualizer.UIRegisterPanel.WeButton.interactable = trigger;
-        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = trigger;
-        registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = trigger;
-        registerAluOutVisualizer.UIRegisterPanel.WeButton.interactable = trigger;
     }
 
     protected override bool CheckWinCondition()

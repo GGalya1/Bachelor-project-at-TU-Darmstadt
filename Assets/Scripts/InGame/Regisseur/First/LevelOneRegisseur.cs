@@ -54,8 +54,7 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
         {
             WriteEnable = true
         };
-
-        // Кэширование UI-панелей визуализаторов
+        
         _infoSrcARegister = registerSrcAVisualizer.UIRegisterPanel;
         _infoSrcBRegister = registerSrcBVisualizer.UIRegisterPanel;
         _infoOutputRegister = registerOutputVisualizer.UIRegisterPanel;
@@ -123,7 +122,7 @@ public class LevelOneRegisseur : BaseLevelRegisseur<LevelOneState>
                 break;
         }
 
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizers and concrete objects
         _srcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         _srcB.WriteEnable = registerSrcBVisualizer.isWriteEnabled;
         _output.WriteEnable = registerOutputVisualizer.isWriteEnabled;

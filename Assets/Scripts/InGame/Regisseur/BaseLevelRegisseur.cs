@@ -76,11 +76,6 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
 
     /// <summary> Visually indicates when a tick is triggered (e.g., flashing registers). </summary>
     protected abstract void BlinkClockedComponents();
-
-    /// <summary> Blocks all interactive elements to avoid confusion during signal visualization (WE-buttons etc.). </summary>
-    //protected abstract void BlockInGameInteractable();
-
-    //protected abstract void ReleaseInGameInteractable();
     #endregion
 
     /// <summary> 
@@ -239,10 +234,10 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
     }
     protected abstract bool CheckWinCondition();
     
-    protected void BlockInGameInteractable() {
+    private void BlockInGameInteractable() {
         foreach (var v in managedInteractable) v.SetInteractable(false);
     }
-    protected void ReleaseInGameInteractable() {
+    private void ReleaseInGameInteractable() {
         foreach (var v in managedInteractable) v.SetInteractable(true);
     }
 

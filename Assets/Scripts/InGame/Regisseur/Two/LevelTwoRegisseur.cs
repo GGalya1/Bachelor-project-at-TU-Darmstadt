@@ -11,7 +11,6 @@ public struct LevelTwoState
 
 public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
 {
-    [FormerlySerializedAs("aluVisualizer")]
     [FormerlySerializedAs("_aluVizualizer")]
     [Header("Level 2 Specific Components")]
     [SerializeField] private AluVisualiser aluVisualizer;

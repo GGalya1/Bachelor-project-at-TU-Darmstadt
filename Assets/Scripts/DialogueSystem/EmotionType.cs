@@ -6,11 +6,11 @@ public enum EmotionType
     Alert = 0,
     Angry = 1,
     Cool = 2,
-    Dostalo = 3,
+    HadEnough = 3,
     Happy = 4,
     Horny = 5,
     Meh = 6,
-    Playfull = 7,
+    Playful = 7,
     Questionable = 8,
     Tears = 9,
     YesYouCan = 10

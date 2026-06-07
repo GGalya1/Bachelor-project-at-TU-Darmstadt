@@ -32,7 +32,7 @@ public class LevelFiveRegisseur : BaseLevelRegisseur<LevelFiveState>
     [FormerlySerializedAs("_registerSrcBVisualizer")] [SerializeField] private RegisterVisualizer registerSrcBVisualizer;
     [FormerlySerializedAs("_registerOutputVisualizer")] [SerializeField] private RegisterVisualizer registerOutputVisualizer;
     [FormerlySerializedAs("_memoryVisualizer")] [SerializeField] private InstructionDataMemoryVisualizer memoryVisualizer;
-    [FormerlySerializedAs("aluVizualizer")] [FormerlySerializedAs("_aluVizualizer")] [SerializeField] private AluVisualiser aluVisualizer;
+    [FormerlySerializedAs("aluVisualizer")] [FormerlySerializedAs("_aluVizualizer")] [SerializeField] private AluVisualiser aluVisualizer;
     [FormerlySerializedAs("extenderVizualizer")] [FormerlySerializedAs("_extenderVizualizer")] [SerializeField] private ExtenderVisualizer extenderVisualizer;
 
     [FormerlySerializedAs("_blinkerNumber")] [SerializeField] private Blinker blinkerNumber;
@@ -144,7 +144,7 @@ public class LevelFiveRegisseur : BaseLevelRegisseur<LevelFiveState>
 
     protected override void HandleClockUpdate() {
         
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizers and concrete objects
         _srcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         _srcB.WriteEnable = registerSrcBVisualizer.isWriteEnabled;
         _output.WriteEnable = registerOutputVisualizer.isWriteEnabled;
@@ -157,21 +157,20 @@ public class LevelFiveRegisseur : BaseLevelRegisseur<LevelFiveState>
 
         _output.Input = Extender.Evaluate(extenderVisualizer.CurrentAluOperation, (uint)_srcB.Output);
 
-        if (_currentBus == 2)
+        switch (_currentBus)
         {
-            _dataInstructionMemory.LoadWord(0, _output.Output);
-        }
-        else if (_currentBus == 3)
-        {
-            _dataInstructionMemory.LoadWord(4, _output.Output);
-        }
-        else if (_currentBus == 4)
-        {
-            _dataInstructionMemory.LoadWord(8, _output.Output);
-        }
-        else if (_currentBus == 5)
-        {
-            _dataInstructionMemory.LoadWord(12, _output.Output);
+            case 2:
+                _dataInstructionMemory.LoadWord(0, _output.Output);
+                break;
+            case 3:
+                _dataInstructionMemory.LoadWord(4, _output.Output);
+                break;
+            case 4:
+                _dataInstructionMemory.LoadWord(8, _output.Output);
+                break;
+            case 5:
+                _dataInstructionMemory.LoadWord(12, _output.Output);
+                break;
         }
 
 
