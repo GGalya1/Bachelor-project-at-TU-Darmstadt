@@ -720,14 +720,31 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
         {
             sidePanelInformer.SetStateInfo((int)StateName.DECODE);
         }
-        else if (TickCounter - 4 >= 0)
-        {
-            if (TickStateValues[TickCounter - 3].RegisterInstrValue < GameConstants.MinValidInstruction) return;
-            var opcode = TickStateValues[TickCounter - 3].RegisterInstrValue & 0x7F;
+        else if (TickCounter - 2 >= 0) {
+            var s = TickStateValues[TickCounter - 1];
 
-            if (opcode == 0x03)
+            if (s.RegisterInstrValue < GameConstants.MinValidInstruction) return;
+            var opcode = s.RegisterInstrValue & 0x7F;
+
+            switch(opcode)
             {
-                sidePanelInformer.SetStateInfo((int)StateName.MEM_WB);
+                case 0x33:
+                    sidePanelInformer.SetStateInfo((int)StateName.EXECUTE_R);
+                    break;
+                case 0x13:
+                    sidePanelInformer.SetStateInfo((int)StateName.EXECUTE_I);
+                    break;
+                case 0x03:
+                case 0x23:
+                    sidePanelInformer.SetStateInfo((int)StateName.MEM_ADDRESS);
+                    break;
+                case 0x63:
+                    sidePanelInformer.SetStateInfo((int)StateName.BEQ);
+                    break;
+                case 0x6F:
+                case 0x67:
+                    sidePanelInformer.SetStateInfo((int)StateName.JAL);
+                    break;
             }
         }
         else if (TickCounter - 3 >= 0)
@@ -755,31 +772,14 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
                     break;
             }
         }
-        else if (TickCounter - 2 >= 0) {
-            var s = TickStateValues[TickCounter - 1];
+        else if (TickCounter - 4 >= 0)
+        {
+            if (TickStateValues[TickCounter - 3].RegisterInstrValue < GameConstants.MinValidInstruction) return;
+            var opcode = TickStateValues[TickCounter - 3].RegisterInstrValue & 0x7F;
 
-            if (s.RegisterInstrValue < GameConstants.MinValidInstruction) return;
-            var opcode = s.RegisterInstrValue & 0x7F;
-
-            switch(opcode)
+            if (opcode == 0x03)
             {
-                case 0x33:
-                    sidePanelInformer.SetStateInfo((int)StateName.EXECUTE_R);
-                    break;
-                case 0x13:
-                    sidePanelInformer.SetStateInfo((int)StateName.EXECUTE_I);
-                    break;
-                case 0x03:
-                case 0x23:
-                    sidePanelInformer.SetStateInfo((int)StateName.MEM_ADDRESS);
-                    break;
-                case 0x63:
-                    sidePanelInformer.SetStateInfo((int)StateName.BEQ);
-                    break;
-                case 0x6F:
-                case 0x67:
-                    sidePanelInformer.SetStateInfo((int)StateName.JAL);
-                    break;
+                sidePanelInformer.SetStateInfo((int)StateName.MEM_WB);
             }
         }
         else

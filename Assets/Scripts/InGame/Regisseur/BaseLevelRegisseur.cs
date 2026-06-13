@@ -192,6 +192,8 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
 
             if (nextLevelToUnlockIndex > highestUnlockedIndex)
             {
+                PlayerPrefs.SetInt(GameConstants.UnlockedLevelKey, nextLevelToUnlockIndex);
+                PlayerPrefs.Save();
                 CustomLog.LogEditor($"New level unlocked: Scene Index {nextLevelToUnlockIndex}");
             }
 
@@ -282,7 +284,7 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
     
     protected IEnumerator DelayedSignal(LineRenderer seg, int value, bool reverse = false)
     {
-        yield return new WaitUntil(() => busController.NoActiveSignals);
+        yield return WaitNoSignals;
         busController.StartBusSignal(seg, value, reverse);
     }
 
@@ -291,7 +293,7 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
         LineRenderer seg2, int val2,
         bool rev1 = false, bool rev2 = false)
     {
-        yield return new WaitUntil(() => busController.NoActiveSignals);
+        yield return WaitNoSignals;
         busController.StartBusSignal(seg1, val1, rev1);
         busController.StartBusSignal(seg2, val2, rev2);
     }

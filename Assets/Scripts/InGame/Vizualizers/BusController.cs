@@ -131,7 +131,7 @@ public class BusController : MonoBehaviour
 
         signal.UIRegisterPanel.Display("Signal", $"{value}");
 
-        // 2. Important: Adjust the speed and add it to the monitoring list
+        // Important: Adjust the speed and add it to the monitoring list
         _activeSignals.Add(signal);
         StartCoroutine(MoveSphereAlongPath(signal, pathPoints));
     }
@@ -139,27 +139,21 @@ public class BusController : MonoBehaviour
     // A coroutine to move a ball along a given array of points
     private IEnumerator MoveSphereAlongPath(BusSignal signal, Vector3[] pathPoints)
     {
-        // if (signal == null) yield break;
-
         for (var i = 1; i < pathPoints.Length; i++)
         {
             var targetPoint = pathPoints[i];
 
-            while (signal.transform.position != targetPoint)
+            while (Vector3.Distance(signal.transform.position, targetPoint) > 0.001f)
             {
-                // Take the current speed (normal or fast-forward)
-                var currentSpeed = movementSpeed;
-
                 signal.transform.position = Vector3.MoveTowards(
                     signal.transform.position,
                     targetPoint,
-                    currentSpeed * Time.deltaTime
+                    movementSpeed * Time.deltaTime
                 );
                 yield return null;
             }
         }
-
-        // 4. Remove from the list before destruction
+        
         ReturnSignal(signal);
     }
 
@@ -167,61 +161,7 @@ public class BusController : MonoBehaviour
     {
         movementSpeed = value;
     }
-
-    /*private void InitializePaths()
-    {
-        foreach (var lr in busSegments)
-        {
-            // Check for null (if there are empty slots in the inspector)
-            if (lr == null)
-            {
-                CustomLog.LogEditorWarning("An empty LineRenderer slot was found in the busSegments array. Skipping it.");
-                continue;
-            }
-
-            // The transform relative to which the LineRenderer stores its points
-            var busTransform = lr.transform;
-
-            var pointCount = lr.positionCount;
-            if (pointCount < 2)
-            {
-                CustomLog.LogEditorWarning($"The '{lr.gameObject.name}' bus has fewer than 2 vertices and will not be loaded.");
-                continue;
-            }
-
-            // Retrieve local coordinates from the LineRenderer
-            var localPoints = new Vector3[pointCount];
-            lr.GetPositions(localPoints);
-
-            // Arrays for storing paths in world space
-            var worldPoints = new Vector3[pointCount];
-            var reversedWorldPoints = new Vector3[pointCount];
-
-            // --- 2. CONVERSION OF LOCAL POINTS TO WORLD COORDINATES ---
-
-            for (var i = 0; i < pointCount; i++)
-                // We use TransformPoint to convert the local position (localPoints[i])
-                // to a global (world) position, taking into account the position and rotation of the bus's parent (busTransform).
-                worldPoints[i] = busTransform.TransformPoint(localPoints[i]);
-
-            // --- 3. SAVING THE STRAIGHT PATH ---
-
-            // We store an array of world coordinates for forward motion
-            _busPaths.Add(lr, worldPoints);
-
-            // --- 4. SAVING THE RETURN PATH (REVERSE) ---
-
-            // Copy the array of world coordinates
-            Array.Copy(worldPoints, reversedWorldPoints, pointCount);
-
-            // Reverse the order of the elements for backward movement
-            Array.Reverse(reversedWorldPoints);
-
-            // We store an array of inverse global coordinates
-            _reverseBusPaths.Add(lr, reversedWorldPoints);
-        }
-    }*/
-
+    
     private Vector3[] GetPathPoints(LineRenderer targetBus, bool reversed)
     {
         // if (targetBus == null) return null;
