@@ -41,8 +41,6 @@ public class DialogueManager : MonoBehaviour
     public void SetupHintDialogue() {
         if (hintGraph == null) return;
 
-        _currentNodeIndex = 0;
-
         OnHintEnabled?.Invoke();
         StartDialogue(hintGraph);
     }

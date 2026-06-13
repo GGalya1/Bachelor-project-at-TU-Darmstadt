@@ -192,8 +192,6 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
 
             if (nextLevelToUnlockIndex > highestUnlockedIndex)
             {
-                PlayerPrefs.SetInt(GameConstants.UnlockedLevelKey, nextLevelToUnlockIndex);
-                PlayerPrefs.Save(); // Saving data to disk
                 Debug.Log($"New level unlocked: Scene Index {nextLevelToUnlockIndex}");
             }
 

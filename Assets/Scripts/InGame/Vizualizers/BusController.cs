@@ -20,7 +20,7 @@ public class BusController : MonoBehaviour
     // These are assigned via the Inspector.
     //public LineRenderer[] busSegments;
 
-    private readonly List<BusSignal> _activeSignals = new();
+    private readonly HashSet<BusSignal> _activeSignals = new();
 
 
     // A dictionary to store the path for each bus so it doesn't have to be calculated every time

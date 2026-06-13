@@ -70,9 +70,6 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public void RestartLevel()
     {
-        /*int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        SceneManager.LoadScene(currentSceneIndex);*/
-
         StartCoroutine(LoadWithTransition(SceneManager.GetActiveScene().buildIndex));
     }
 
@@ -90,8 +87,8 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public void LoadNextLevel()
     {
-        if (SceneManager.GetActiveScene().buildIndex == GameConstants.FullProcessorSceneIndex ||
-            SceneManager.GetActiveScene().buildIndex == GameConstants.OneTickProcessorSceneIndex) {
+        var currentIndex = SceneManager.GetActiveScene().buildIndex;
+        if (currentIndex is GameConstants.FullProcessorSceneIndex or GameConstants.OneTickProcessorSceneIndex) {
             var nextData = OnRequestNextLevelData?.Invoke();
 
             if (nextData != null)
@@ -108,7 +105,7 @@ public class LevelManager : MonoBehaviour
             return;
         }
 
-        var nextLevelIndex = SceneManager.GetActiveScene().buildIndex + 1;
+        var nextLevelIndex = currentIndex + 1;
 
         // Save progress if this is a new level
         var savedProgress = PlayerPrefs.GetInt(GameConstants.UnlockedLevelKey, 1);
@@ -133,14 +130,6 @@ public class LevelManager : MonoBehaviour
 
     private IEnumerator LoadWithTransition(int targetIndex)
     {
-        /*
-        if (loadingOverlay == null)
-        {
-            SceneManager.LoadScene(targetIndex);
-            yield break;
-        }
-        */
-
         // FadeIn
         loadingOverlay.blocksRaycasts = true;
         loadingOverlay.interactable = false;

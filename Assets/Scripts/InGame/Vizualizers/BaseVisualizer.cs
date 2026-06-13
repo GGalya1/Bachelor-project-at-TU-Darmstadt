@@ -43,13 +43,10 @@ public abstract class BaseVisualizer : MonoBehaviour, IVisualizer
 
     // --- UNITY LIFECYCLE ---
 
-    private void Start()
-    {
-        _isBigModelRendererNull = bigModelRenderer == null;
-    }
-
     protected virtual void Awake()
     {
+        _isBigModelRendererNull = bigModelRenderer == null;
+        
         _propBlock = new MaterialPropertyBlock();
 
         if (bigModelRenderer != null)
