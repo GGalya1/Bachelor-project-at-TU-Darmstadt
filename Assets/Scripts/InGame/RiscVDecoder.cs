@@ -3,7 +3,7 @@
         public static string CommandBuilder(uint val)
     {
         if (val < GameConstants.MinValidInstruction) {
-            return $"{val}";
+            return val.ToString();
         }
 
         var opcode = val & 0x7F;

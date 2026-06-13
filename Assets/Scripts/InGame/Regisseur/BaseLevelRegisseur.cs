@@ -104,7 +104,7 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
         nextClick.onClick.AddListener(HandleNextTick);
         prevClick.onClick.AddListener(HandlePrevTick);
         checkSolutionButton.onClick.AddListener(CheckSolution);
-        currentTickText.text = $"{TickCounter}";
+        currentTickText.SetText("{0}", TickCounter);
         levelTargetText.text = levelTargetDescription;
 
         // 2. Initializing history
@@ -137,7 +137,7 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
         HandleClockUpdate();
 
         TickCounter++;
-        currentTickText.text = $"{TickCounter}";
+        currentTickText.SetText("{0}", TickCounter);
         UpdateVisualizers();
 
         // The Logic of History
@@ -168,7 +168,7 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
         BlockInGameInteractable();
 
         TickCounter--;
-        currentTickText.text = $"{TickCounter}";
+        currentTickText.SetText("{0}", TickCounter);
 
         // We are waiting for the reverse rendering to finish
         yield return StartCoroutine(ReverseBusVisualizations());

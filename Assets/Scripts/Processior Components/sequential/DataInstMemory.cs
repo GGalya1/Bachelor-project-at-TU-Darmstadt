@@ -19,7 +19,7 @@ public class DataInstMemory
     #endregion
 
     // all information is stored as a pair (adress - object). For Objects stays instructions and data
-    public readonly Dictionary<int, int> Memory = new Dictionary<int, int>();
+    public readonly Dictionary<int, int> Memory = new();
 
     public void LoadWord(int address, int data) { 
         Memory[address] = data;

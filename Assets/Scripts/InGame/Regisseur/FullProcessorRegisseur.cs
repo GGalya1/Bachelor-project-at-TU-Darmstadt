@@ -284,17 +284,12 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
         ApplyMuxState(s.MuXsrcAPath, srcAmuxVisualizer);
         ApplyMuxState(s.MuXsrcBPath, srcBmuxVisualizer);
         ApplyMuxState(s.MuXresultPath, resultMuxVisualizer);
-
-        _dataInstructionMemory = new DataInstMemory
-        {
-            Memory =
-            {
-                [0] = s.FirstMemoryValue,
-                [4] = s.SecondMemoryValue,
-                [8] = s.ThirdMemoryValue,
-                [12] = s.FourthMemoryValue
-            }
-        };
+        
+        // WE for dataInstrMem ???
+        _dataInstructionMemory.LoadWord(0, s.FirstMemoryValue);
+        _dataInstructionMemory.LoadWord(4, s.SecondMemoryValue);
+        _dataInstructionMemory.LoadWord(8, s.ThirdMemoryValue);
+        _dataInstructionMemory.LoadWord(12, s.FourthMemoryValue);
 
         // noch Register File einfuegen
         _registerFile.InitializeRegisters(s.RegisterFieldValue);

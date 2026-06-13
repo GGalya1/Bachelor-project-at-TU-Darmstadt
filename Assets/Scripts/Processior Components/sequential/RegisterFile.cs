@@ -48,7 +48,7 @@ public class RegisterFile: ISequentialLogic
     }
 
     public void InitializeRegisters(int[] values) {
-        Registers = values;
+        Registers = (int[])values.Clone();
     }
 
     // read of registers in Register file is O(1)

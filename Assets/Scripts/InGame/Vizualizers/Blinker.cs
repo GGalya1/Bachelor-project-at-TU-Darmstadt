@@ -12,12 +12,15 @@ public class Blinker : MonoBehaviour
     private Coroutine _coroutine;
     private MaterialPropertyBlock _propBlock;
     private static readonly int ColorPropertyID = Shader.PropertyToID("_BaseColor");
+    
+    private WaitForSeconds _wait;
 
     private void Awake()
     {
         if (targetRenderer == null) targetRenderer = GetComponent<Renderer>();
 
         _propBlock = new MaterialPropertyBlock();
+        _wait = new WaitForSeconds(duration);
         
         if (targetRenderer != null)
             _originalColor = targetRenderer.sharedMaterial.color;
@@ -34,7 +37,7 @@ public class Blinker : MonoBehaviour
     {
         SetRendererColor(blinkColor);
 
-        yield return new WaitForSeconds(duration);
+        yield return _wait;
 
         SetRendererColor(_originalColor);
         _coroutine = null;

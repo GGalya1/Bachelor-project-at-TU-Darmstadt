@@ -134,20 +134,15 @@ public class LevelThirdRegisseur : BaseLevelRegisseur<LevelThreeState>
     {
         _srcA.Reset(s.RegisterPCValue);
         _srcB.Reset(s.RegisterInstrValue);
-        _dataInstructionMemory = new DataInstMemory
-        {
-            Memory =
-            {
-                [0] = s.FirstMemoryValue,
-                [4] = s.SecondMemoryValue,
-                [8] = s.ThirdMemoryValue,
-                [12] = s.FourthMemoryValue
-            }
-        };
+        
+        _dataInstructionMemory.MemoryWrite = s.InstrDataMemoryWe;
+        _dataInstructionMemory.LoadWord(0, s.FirstMemoryValue);
+        _dataInstructionMemory.LoadWord(4, s.SecondMemoryValue);
+        _dataInstructionMemory.LoadWord(8, s.ThirdMemoryValue);
+        _dataInstructionMemory.LoadWord(12, s.FourthMemoryValue);
 
         _srcA.WriteEnable = s.RegisterPcwe;
         _srcB.WriteEnable = s.RegisterInstrWe;
-        _dataInstructionMemory.MemoryWrite = s.InstrDataMemoryWe;
 
         ApplyMuxState(s.CurrentChosenMuxPath, multiplexerVisualizer);
     }
