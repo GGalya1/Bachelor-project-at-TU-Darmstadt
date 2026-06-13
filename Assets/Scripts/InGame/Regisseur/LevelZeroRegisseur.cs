@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -13,31 +14,56 @@ public struct LevelZeroState
     public bool OutputRegisterWe;
 }
 
+[Serializable]
+public class LevelZeroBusSegments
+{
+    [Tooltip("SrcA register -> SrcB register")]
+    public LineRenderer srcAToSrcB;
+
+    [Tooltip("SrcB register -> Output register")]
+    public LineRenderer srcBToOutput;
+
+    public void RegisterAll(BusController c)
+    {
+        c.RegisterSegment(srcAToSrcB);
+        c.RegisterSegment(srcBToOutput);
+    }
+}
+
 public class LevelZeroRegisseur : BaseLevelRegisseur<LevelZeroState>
 {
-    [FormerlySerializedAs("_registerSrcAVisualizer")]
-    [Header("Level 0 Specific Components")]
-    [SerializeField] private RegisterVisualizer registerSrcAVisualizer;
-    [FormerlySerializedAs("_registerSrcBVisualizer")] [SerializeField] private RegisterVisualizer registerSrcBVisualizer;
-    [FormerlySerializedAs("_registerOutputVisualizer")] [SerializeField] private RegisterVisualizer registerOutputVisualizer;
+    [FormerlySerializedAs("_registerSrcAVisualizer")] [Header("Level 0 Specific Components")] [SerializeField]
+    private RegisterVisualizer registerSrcAVisualizer;
 
-    [FormerlySerializedAs("_srcAValue")] [SerializeField] private int srcAValue;
-    [FormerlySerializedAs("_srcBValue")] [SerializeField] private int srcBValue;
+    [FormerlySerializedAs("_registerSrcBVisualizer")] [SerializeField]
+    private RegisterVisualizer registerSrcBVisualizer;
 
-    #region CACHED UI REFERENCES
-    private InfoPanelUI _infoSrcARegister;
-    private InfoPanelUI _infoSrcBRegister;
-    private InfoPanelUI _infoOutputRegister;
-    #endregion
+    [FormerlySerializedAs("_registerOutputVisualizer")] [SerializeField]
+    private RegisterVisualizer registerOutputVisualizer;
 
-    // Intern components for computations
-    private Register _srcA;
-    private Register _srcB;
-    private Register _output;
+    [FormerlySerializedAs("_srcAValue")] [SerializeField]
+    private int srcAValue;
+
+    [FormerlySerializedAs("_srcBValue")] [SerializeField]
+    private int srcBValue;
+
+    [Header("Bus Segments")] [SerializeField]
+    private LevelZeroBusSegments buses;
 
     //protected override int RightAnswerValue => 4;
 
     private int _currentBus; // [0, 2]
+    private Register _output;
+
+    // Intern components for computations
+    private Register _srcA;
+    private Register _srcB;
+
+    protected override void Start()
+    {
+        base.Start();
+        buses.RegisterAll(busController);
+    }
 
     protected override void OnLevelStart()
     {
@@ -64,9 +90,9 @@ public class LevelZeroRegisseur : BaseLevelRegisseur<LevelZeroState>
 
     protected override void ApplyState(LevelZeroState s)
     {
-        _srcA = new Register(s.RegisterAValue);
-        _srcB = new Register(s.RegisterBValue);
-        _output = new Register(s.OutputRegisterValue);
+        _srcA.Reset(s.RegisterAValue);
+        _srcB.Reset(s.RegisterBValue);
+        _output.Reset(s.OutputRegisterValue);
         _srcA.WriteEnable = s.RegisterAwe;
         _srcB.WriteEnable = s.RegisterBwe;
         _output.WriteEnable = s.OutputRegisterWe;
@@ -81,7 +107,7 @@ public class LevelZeroRegisseur : BaseLevelRegisseur<LevelZeroState>
 
     protected override bool CheckWinCondition()
     {
-        return (_output.Output == RightAnswerValue);
+        return _output.Output == RightAnswerValue;
     }
 
     protected override LevelZeroState GetCurrentState()
@@ -144,13 +170,8 @@ public class LevelZeroRegisseur : BaseLevelRegisseur<LevelZeroState>
     protected override IEnumerator RunBusVisualizations()
     {
         if (_currentBus == 0)
-        {
-            busController.StartBusSignal(busController.busSegments[0], _srcA.Output);
-        }
-        else if (_currentBus == 1)
-        {
-            busController.StartBusSignal(busController.busSegments[1], _srcB.Output);
-        }
+            busController.StartBusSignal(buses.srcAToSrcB, _srcA.Output);
+        else if (_currentBus == 1) busController.StartBusSignal(buses.srcBToOutput, _srcB.Output);
 
         _currentBus++;
         yield return new WaitUntil(() => busController.NoActiveSignals);
@@ -159,31 +180,18 @@ public class LevelZeroRegisseur : BaseLevelRegisseur<LevelZeroState>
     protected override IEnumerator ReverseBusVisualizations()
     {
         if (_currentBus == 2)
-        {
-            busController.StartBusSignal(busController.busSegments[1], _output.Input, true);
-        }
-        else if (_currentBus == 1)
-        {
-            busController.StartBusSignal(busController.busSegments[0], _srcB.Input, true);
-        }
+            busController.StartBusSignal(buses.srcBToOutput, _output.Input, true);
+        else if (_currentBus == 1) busController.StartBusSignal(buses.srcAToSrcB, _srcB.Input, true);
 
         _currentBus--;
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
-    #region
-    protected override void BlockInGameInteractable()
-    {
-        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
-        registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = false;
-        registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = false;
-    }
+    #region CACHED UI REFERENCES
 
-    protected override void ReleaseInGameInteractable()
-    {
-        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
-        registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = true;
-        registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = true;
-    }
+    private InfoPanelUI _infoSrcARegister;
+    private InfoPanelUI _infoSrcBRegister;
+    private InfoPanelUI _infoOutputRegister;
+
     #endregion
 }

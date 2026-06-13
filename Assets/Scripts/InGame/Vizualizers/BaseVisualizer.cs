@@ -125,9 +125,16 @@ public abstract class BaseVisualizer : MonoBehaviour, IVisualizer
     public abstract void ResetVisualisation();
     protected abstract void InitializePanelController();
 
+    public abstract void SetInteractable(bool value);
+    
     // --- PRIVATE/PROTECTED METHODS ---
-
-    private void PrepareHiddenState()
+    protected void KillPanelTweens()
+    {
+        panelInstance.transform.DOKill();
+        panelCanvasGroup.DOKill();
+    }
+    
+    protected void PrepareHiddenState()
     {
         panelCanvasGroup.alpha = 0;
         panelCanvasGroup.interactable = false;

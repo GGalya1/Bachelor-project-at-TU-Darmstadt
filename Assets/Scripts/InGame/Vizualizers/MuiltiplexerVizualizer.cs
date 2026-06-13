@@ -98,5 +98,13 @@ public class MultiplexerVisualizer: BaseVisualizer
         _propBlock.SetColor(ColorPropertyID, color);
         rnd.SetPropertyBlock(_propBlock);
     }
+    
+    public override void SetInteractable(bool value) {
+        UIController.FirstWayButton.interactable = value;
+        UIController.SecondWayButton.interactable = value;
+
+        if (UIController.ThirdWayButton != null)
+            UIController.ThirdWayButton.interactable = value;
+    }
     #endregion
 }

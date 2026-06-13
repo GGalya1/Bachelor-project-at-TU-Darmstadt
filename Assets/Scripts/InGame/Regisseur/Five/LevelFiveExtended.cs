@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -13,25 +14,52 @@ public struct LevelFiveExtendedState
     public int ExtenderOperation;
 }
 
+[Serializable]
+public class LevelFiveExtendedBusSegments
+{
+    [Tooltip("SrcA register (raw instruction word) -> Extend unit")]
+    public LineRenderer srcAToExtend;
+
+    [Tooltip("Extend unit output -> Output register")]
+    public LineRenderer extendToOutput;
+
+    public void RegisterAll(BusController c)
+    {
+        c.RegisterSegment(srcAToExtend);
+        c.RegisterSegment(extendToOutput);
+    }
+}
+
 public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
 {
     [FormerlySerializedAs("_registerSrcAVisualizer")]
     [Header("Level 5 (Extended) Specific Components")]
-    [SerializeField] private RegisterVisualizer registerSrcAVisualizer;
-    [FormerlySerializedAs("_registerOutputVisualizer")] [SerializeField] private RegisterVisualizer registerOutputVisualizer;
-    [FormerlySerializedAs("extenderVizualizer")] [FormerlySerializedAs("_extenderVizualizer")] [SerializeField] private ExtenderVisualizer extenderVisualizer;
+    [SerializeField]
+    private RegisterVisualizer registerSrcAVisualizer;
 
-    [FormerlySerializedAs("InputRegisterValue")] [SerializeField] private uint inputRegisterValue;
+    [FormerlySerializedAs("_registerOutputVisualizer")] [SerializeField]
+    private RegisterVisualizer registerOutputVisualizer;
 
-    #region CACHED UI REFERENCES
-    private InfoPanelUI _infoSrcARegister;
-    private InfoPanelUI _infoOutputRegister;
-    #endregion
+    [FormerlySerializedAs("extenderVizualizer")] [FormerlySerializedAs("_extenderVizualizer")] [SerializeField]
+    private ExtenderVisualizer extenderVisualizer;
 
-    private Register _srcA;
+    [FormerlySerializedAs("InputRegisterValue")] [SerializeField]
+    private uint inputRegisterValue;
+
+    [Header("Bus Segments")] [SerializeField]
+    private LevelFiveExtendedBusSegments buses;
+
     private Register _output;
 
+    private Register _srcA;
+
     protected int CurrentBus = 0;
+
+    protected override void Start()
+    {
+        base.Start();
+        buses.RegisterAll(busController);
+    }
 
     protected override void OnLevelStart()
     {
@@ -39,7 +67,7 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         {
             WriteEnable = true
         };
-        _output = new Register()
+        _output = new Register
         {
             WriteEnable = true
         };
@@ -52,8 +80,8 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
 
     protected override void ApplyState(LevelFiveExtendedState s)
     {
-        _srcA = new Register(s.RegisterValue);
-        _output = new Register(s.RegisterOutputValue);
+        _srcA.Reset(s.RegisterValue);
+        _output.Reset(s.RegisterOutputValue);
 
         _srcA.WriteEnable = s.RegisterWe;
         _output.WriteEnable = s.RegisterOutputWe;
@@ -65,17 +93,6 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
     {
         registerSrcAVisualizer.TriggerBlink();
         registerOutputVisualizer.TriggerBlink();
-    }
-
-    protected override void BlockInGameInteractable()
-    {
-        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
-        registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = false;
-
-        extenderVisualizer.uiController.FirstOperationButton.interactable = false;
-        extenderVisualizer.uiController.SecondOperationButton.interactable = false;
-        extenderVisualizer.uiController.ThirdOperationButton.interactable = false;
-        extenderVisualizer.uiController.FourthOperationButton.interactable = false;
     }
 
     protected override bool CheckWinCondition()
@@ -93,13 +110,13 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
             RegisterWe = _srcA.WriteEnable,
             RegisterOutputWe = _output.WriteEnable,
 
-            ExtenderOperation = extenderVisualizer.CurrentAluOperation,
+            ExtenderOperation = extenderVisualizer.CurrentAluOperation
         };
     }
 
     protected override void HandleClockUpdate()
     {
-        // sinchronyse vizualisers and concrete objects
+        // synchronize visualizers and concrete objects
         _srcA.WriteEnable = registerSrcAVisualizer.isWriteEnabled;
         _output.WriteEnable = registerOutputVisualizer.isWriteEnabled;
 
@@ -113,28 +130,17 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         _output.Clock();
     }
 
-    protected override void ReleaseInGameInteractable()
-    {
-        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
-        registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = true;
-
-        extenderVisualizer.uiController.FirstOperationButton.interactable = true;
-        extenderVisualizer.uiController.SecondOperationButton.interactable = true;
-        extenderVisualizer.uiController.ThirdOperationButton.interactable = true;
-        extenderVisualizer.uiController.FourthOperationButton.interactable = true;
-    }
-
     protected override IEnumerator ReverseBusVisualizations()
     {
-        busController.StartBusSignal(busController.busSegments[0], _srcA.Output, true);
-        busController.StartBusSignal(busController.busSegments[1], _output.Input, true);
+        busController.StartBusSignal(buses.srcAToExtend, _srcA.Output, true);
+        busController.StartBusSignal(buses.extendToOutput, _output.Input, true);
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
 
     protected override IEnumerator RunBusVisualizations()
     {
-        busController.StartBusSignal(busController.busSegments[0], _srcA.Output);
-        busController.StartBusSignal(busController.busSegments[1], _output.Output);
+        busController.StartBusSignal(buses.srcAToExtend, _srcA.Output);
+        busController.StartBusSignal(buses.extendToOutput, _output.Output);
 
         yield return new WaitUntil(() => busController.NoActiveSignals);
     }
@@ -146,4 +152,11 @@ public class LevelFiveExtended : BaseLevelRegisseur<LevelFiveExtendedState>
         registerSrcAVisualizer.ForceUpdateWriteEnableVisualization(_srcA.WriteEnable);
         registerOutputVisualizer.ForceUpdateWriteEnableVisualization(_output.WriteEnable);
     }
+
+    #region CACHED UI REFERENCES
+
+    private InfoPanelUI _infoSrcARegister;
+    private InfoPanelUI _infoOutputRegister;
+
+    #endregion
 }

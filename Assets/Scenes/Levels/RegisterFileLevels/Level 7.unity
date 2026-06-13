@@ -1116,6 +1116,7 @@ MonoBehaviour:
   speedSlider: {fileID: 638722862}
   spherePrefab: {fileID: 6425462522399718016, guid: 1d0544c75d85507478621a5dee2e0bd8, type: 3}
   movementSpeed: 7
+  poolPreWarmCount: 2
   busSegments:
   - {fileID: 1226422104}
   - {fileID: 1719315176}
@@ -1135,6 +1136,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelTargetDescription: Schreibe in Register 3 die Summe von r7 und r6.
+  managedInteractable:
+  - {fileID: 970035351}
+  - {fileID: 2070813589}
+  - {fileID: 1846687519}
+  - {fileID: 9100954751381668847}
+  - {fileID: 1560145823}
   correctAnswer: 0
   nextClick: {fileID: 8933483285275860231}
   prevClick: {fileID: 8933483285275860230}
@@ -1156,6 +1163,12 @@ MonoBehaviour:
   registerOutputVisualizer: {fileID: 2070813589}
   registerFileVisualizer: {fileID: 9100954751381668847}
   aluVisualizer: {fileID: 1560145823}
+  buses:
+    srcAToRegFileA1: {fileID: 1226422104}
+    srcBToRegFileA2: {fileID: 1719315176}
+    rd1ToAlu: {fileID: 934957545}
+    rd2ToAlu: {fileID: 1804955430}
+    aluToOutput: {fileID: 203119610}
 --- !u!4 &1211114600 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5440707293445741943, guid: 494f6d43e170e9145bc7865d243ee00b, type: 3}
@@ -2838,7 +2851,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2136800545}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
@@ -2890,7 +2903,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1

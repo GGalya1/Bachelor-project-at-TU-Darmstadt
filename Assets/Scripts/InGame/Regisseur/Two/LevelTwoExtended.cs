@@ -13,9 +13,26 @@ public struct LevelTwoExtendedState
     public int AluOperation;
 }
 
+[System.Serializable]
+public class LevelTwoExtendedBusSegments
+{
+    [Tooltip("SrcA register -> ALU input A")]
+    public LineRenderer srcAToAlu;
+    [Tooltip("SrcB register → ALU input B")]
+    public LineRenderer srcBToAlu;
+    [Tooltip("ALU result → Output register")]
+    public LineRenderer aluToOutput;
+
+    public void RegisterAll(BusController c)
+    {
+        c.RegisterSegment(srcAToAlu);
+        c.RegisterSegment(srcBToAlu);
+        c.RegisterSegment(aluToOutput);
+    }
+}
+
 public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
 {
-    [FormerlySerializedAs("aluVisualizer")]
     [FormerlySerializedAs("_aluVizualizer")]
     [Header("Level 2 (Extender) Specific Components")]
     [SerializeField] private AluVisualiser aluVisualizer;
@@ -37,7 +54,16 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
     private Register _output;
 
     private int _currentBus; // [0, 1]
+    
+    [Header("Bus Segments")] [SerializeField]
+    private LevelTwoExtendedBusSegments buses;
 
+    protected override void Start()
+    {
+        base.Start();
+        buses.RegisterAll(busController);
+    }
+    
     protected override void OnLevelStart()
     {
         _srcA = new Register(srcAValue)
@@ -62,20 +88,15 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
 
     protected override void ApplyState(LevelTwoExtendedState s)
     {
-        _srcA = new Register(s.RegisterAValue)
-        {
-            WriteEnable = s.RegisterAwe
-        };
+        _srcA.Reset(s.RegisterAValue);
+        _srcA.WriteEnable = s.RegisterAwe;
 
-        _srcB = new Register(s.RegisterBValue)
-        {
-            WriteEnable = s.RegisterBwe
-        };
 
-        _output = new Register(s.OutputValue)
-        {
-            WriteEnable = s.OutputWe
-        };
+        _srcB.Reset(s.RegisterBValue);
+        _srcB.WriteEnable = s.RegisterBwe;
+
+        _output.Reset(s.OutputValue);
+        _output.WriteEnable = s.OutputWe;
 
         aluVisualizer.ChooseAluOperation(s.AluOperation);
     }
@@ -85,18 +106,6 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
         registerSrcAVisualizer.TriggerBlink();
         registerSrcBVisualizer.TriggerBlink();
         registerOutputVisualizer.TriggerBlink();
-    }
-
-    protected override void BlockInGameInteractable()
-    {
-        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
-        registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = false;
-        registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = false;
-
-        aluVisualizer.uiController.FirstOperationButton.interactable = false;
-        aluVisualizer.uiController.SecondOperationButton.interactable = false;
-        aluVisualizer.uiController.ThirdOperationButton.interactable = false;
-        aluVisualizer.uiController.FourthOperationButton.interactable = false;
     }
 
     protected override bool CheckWinCondition()
@@ -135,28 +144,16 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
         _output.Clock();
     }
 
-    protected override void ReleaseInGameInteractable()
-    {
-        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
-        registerSrcBVisualizer.UIRegisterPanel.WeButton.interactable = true;
-        registerOutputVisualizer.UIRegisterPanel.WeButton.interactable = true;
-
-        aluVisualizer.uiController.FirstOperationButton.interactable = true;
-        aluVisualizer.uiController.SecondOperationButton.interactable = true;
-        aluVisualizer.uiController.ThirdOperationButton.interactable = true;
-        aluVisualizer.uiController.FourthOperationButton.interactable = true;
-    }
-
     protected override IEnumerator ReverseBusVisualizations()
     {
         if (_currentBus >= 1 && _currentBus <= maxTickNumber)
         {
-            busController.StartBusSignal(busController.busSegments[2], _output.Input, true);
+            busController.StartBusSignal(buses.aluToOutput, _output.Input, true);
 
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
-            busController.StartBusSignal(busController.busSegments[0], _srcA.Output, true);
-            busController.StartBusSignal(busController.busSegments[1], _srcB.Output, true);
+            busController.StartBusSignal(buses.srcAToAlu, _srcA.Output, true);
+            busController.StartBusSignal(buses.srcBToAlu, _srcB.Output, true);
 
             _currentBus--;
         }
@@ -167,12 +164,12 @@ public class LevelTwoExtended : BaseLevelRegisseur<LevelTwoExtendedState>
     {
         if (_currentBus >= 0 && _currentBus < maxTickNumber)
         {
-            busController.StartBusSignal(busController.busSegments[0], _srcA.Output);
-            busController.StartBusSignal(busController.busSegments[1], _srcB.Output);
+            busController.StartBusSignal(buses.srcAToAlu, _srcA.Output);
+            busController.StartBusSignal(buses.srcBToAlu, _srcB.Output);
 
             yield return new WaitUntil(() => busController.NoActiveSignals);
 
-            busController.StartBusSignal(busController.busSegments[2], Alu.Calculate(_srcA.Output, _srcB.Output, aluVisualizer.CurrentAluOperation));
+            busController.StartBusSignal(buses.aluToOutput, Alu.Calculate(_srcA.Output, _srcB.Output, aluVisualizer.CurrentAluOperation));
 
             _currentBus++;
         }

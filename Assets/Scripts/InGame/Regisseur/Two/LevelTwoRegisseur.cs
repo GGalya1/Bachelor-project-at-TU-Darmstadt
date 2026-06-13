@@ -9,9 +9,26 @@ public struct LevelTwoState
     public int AluOperation;
 }
 
+[System.Serializable]
+public class LevelTwoBusSegments
+{
+    [Tooltip("PC register output -> ALU input A")]
+    public LineRenderer pcToAdder;
+    [Tooltip("Constant 4 -> ALU input B")]
+    public LineRenderer constFourToAdder;
+    [Tooltip("ALU/adder result -> PC register input")]
+    public LineRenderer adderToPC;
+
+    public void RegisterAll(BusController c)
+    {
+        c.RegisterSegment(pcToAdder);
+        c.RegisterSegment(constFourToAdder);
+        c.RegisterSegment(adderToPC);
+    }
+}
+
 public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
 {
-    [FormerlySerializedAs("aluVisualizer")]
     [FormerlySerializedAs("_aluVizualizer")]
     [Header("Level 2 Specific Components")]
     [SerializeField] private AluVisualiser aluVisualizer;
@@ -27,6 +44,15 @@ public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
     protected override int RightAnswerValue => 8;
 
     private int _currentBus; // [0, 1]
+    
+    [Header("Bus Segments")] [SerializeField]
+    private LevelTwoBusSegments buses;
+    
+    protected override void Start()
+    {
+        base.Start();
+        buses.RegisterAll(busController);
+    }
 
     protected override void OnLevelStart()
     {
@@ -43,10 +69,8 @@ public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
 
     protected override void ApplyState(LevelTwoState s)
     {
-        _srcA = new Register(s.RegisterAValue)
-        {
-            WriteEnable = s.RegisterAwe
-        };
+        _srcA.Reset(s.RegisterAValue);
+        _srcA.WriteEnable = s.RegisterAwe;
 
         aluVisualizer.ChooseAluOperation(s.AluOperation);
     }
@@ -94,11 +118,11 @@ public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
     {
         if (_currentBus is >= 0 and < 5)
         {
-            busController.StartBusSignal(busController.busSegments[0], _srcA.Output);
-            busController.StartBusSignal(busController.busSegments[1], 4);
+            busController.StartBusSignal(buses.pcToAdder, _srcA.Output);
+            busController.StartBusSignal(buses.constFourToAdder, 4);
 
             yield return StartCoroutine(DelayedSignal(
-                busController.busSegments[2],
+                buses.adderToPC,
                 Alu.Calculate(_srcA.Output, 4, aluVisualizer.CurrentAluOperation)
             ));
 
@@ -112,40 +136,16 @@ public class LevelTwoRegisseur : BaseLevelRegisseur<LevelTwoState>
         if (_currentBus is >= 1 and <= 5)
         {
 
-            busController.StartBusSignal(busController.busSegments[2], _srcA.Input, true);
-
-            var prevVal = TickStateValues[TickCounter] is var s ? s.RegisterAValue : 0;
+            busController.StartBusSignal(buses.adderToPC, _srcA.Input, true);
 
             yield return StartCoroutine(DelayedSignals(
-                busController.busSegments[0], prevVal,
-                busController.busSegments[1], 4, true, true
+                buses.pcToAdder, TickStateValues[TickCounter].RegisterAValue ,
+                buses.constFourToAdder, 4, true, true
             ));
             
             _currentBus--;
         }
         yield return new WaitUntil(() => busController.NoActiveSignals);
-    }
-    #endregion
-
-    #region
-    protected override void BlockInGameInteractable()
-    {
-        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = false;
-
-        aluVisualizer.uiController.FirstOperationButton.interactable = false;
-        aluVisualizer.uiController.SecondOperationButton.interactable = false;
-        aluVisualizer.uiController.ThirdOperationButton.interactable = false;
-        aluVisualizer.uiController.FourthOperationButton.interactable = false;
-    }
-
-    protected override void ReleaseInGameInteractable()
-    {
-        registerSrcAVisualizer.UIRegisterPanel.WeButton.interactable = true;
-
-        aluVisualizer.uiController.FirstOperationButton.interactable = true;
-        aluVisualizer.uiController.SecondOperationButton.interactable = true;
-        aluVisualizer.uiController.ThirdOperationButton.interactable = true;
-        aluVisualizer.uiController.FourthOperationButton.interactable = true;
     }
     #endregion
 }

@@ -36,8 +36,6 @@ public class LevelManager : MonoBehaviour
     // for transition between processor levels
     public static Func<object> OnRequestNextLevelData;
 
-    private const string UNLOCKED_LEVEL_KEY = "UnlockedLevelIndex";
-
     public void Awake()
     {
         // Subscribe to dialogue events to toggle UI visibility
@@ -47,11 +45,9 @@ public class LevelManager : MonoBehaviour
 
         InitializeResultsPanel();
 
-        if (loadingOverlay != null)
-        {
-            loadingOverlay.alpha = 1f;
-            loadingOverlay.blocksRaycasts = true;
-        }
+        if (loadingOverlay == null) return;
+        loadingOverlay.alpha = 1f;
+        loadingOverlay.blocksRaycasts = true;
     }
 
     private void Start()
@@ -94,14 +90,15 @@ public class LevelManager : MonoBehaviour
     /// </summary>
     public void LoadNextLevel()
     {
-        if (SceneManager.GetActiveScene().buildIndex == 20) {
+        if (SceneManager.GetActiveScene().buildIndex == GameConstants.FullProcessorSceneIndex ||
+            SceneManager.GetActiveScene().buildIndex == GameConstants.OneTickProcessorSceneIndex) {
             var nextData = OnRequestNextLevelData?.Invoke();
 
             if (nextData != null)
             {
                 FullProcessorRegisseur.Initial = (ProcessorInitialState)nextData;
 
-                StartCoroutine(LoadWithTransition(20));
+                StartCoroutine(LoadWithTransition(GameConstants.FullProcessorSceneIndex));
             }
             else
             {
@@ -114,10 +111,10 @@ public class LevelManager : MonoBehaviour
         var nextLevelIndex = SceneManager.GetActiveScene().buildIndex + 1;
 
         // Save progress if this is a new level
-        var savedProgress = PlayerPrefs.GetInt(UNLOCKED_LEVEL_KEY, 1);
+        var savedProgress = PlayerPrefs.GetInt(GameConstants.UnlockedLevelKey, 1);
         if (nextLevelIndex > savedProgress)
         {
-            PlayerPrefs.SetInt(UNLOCKED_LEVEL_KEY, nextLevelIndex);
+            PlayerPrefs.SetInt(GameConstants.UnlockedLevelKey, nextLevelIndex);
             PlayerPrefs.Save();
         }
 
@@ -136,11 +133,13 @@ public class LevelManager : MonoBehaviour
 
     private IEnumerator LoadWithTransition(int targetIndex)
     {
+        /*
         if (loadingOverlay == null)
         {
             SceneManager.LoadScene(targetIndex);
             yield break;
         }
+        */
 
         // FadeIn
         loadingOverlay.blocksRaycasts = true;

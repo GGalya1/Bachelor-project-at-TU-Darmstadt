@@ -1841,26 +1841,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75768301be46cda49a10c68ab1744582, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _levelTargetDescription: 'Ziel: \r\nSchreibe in Register 3 den Wert 2'
-  _correctAnswer: 2
-  _nextClick: {fileID: 640675038}
-  _prevClick: {fileID: 1547987794}
-  _currentTickText: {fileID: 1612478091}
-  _maxTickNumber: 3
-  _checkSolutionButton: {fileID: 503888151}
-  _levelManager: {fileID: 2086751669}
-  _levelTargetText: {fileID: 377749765}
-  _threeStarCondition: 0
-  _twoStarCondition: 1
-  _oneStarCondition: 2
-  _crossIndicator: {fileID: 1640349074}
-  _crossDisplayDuration: 0.3
-  falledTries: 0
-  _busController: {fileID: 1109257074}
-  _multiplexerVisualizer: {fileID: 802006894}
-  _registerSrcAVisualizer: {fileID: 1319270238}
-  _registerSrcBVisualizer: {fileID: 373000919}
-  _registerOutputVisualizer: {fileID: 1397563056}
+  levelTargetDescription: 'Ziel: \r\nSchreibe in Register 3 den Wert 2'
+  managedInteractable:
+  - {fileID: 1319270238}
+  - {fileID: 373000919}
+  - {fileID: 1397563056}
+  - {fileID: 802006894}
+  correctAnswer: 2
+  nextClick: {fileID: 640675038}
+  prevClick: {fileID: 1547987794}
+  currentTickText: {fileID: 1612478091}
+  maxTickNumber: 3
+  checkSolutionButton: {fileID: 503888151}
+  levelManager: {fileID: 2086751669}
+  levelTargetText: {fileID: 377749765}
+  threeStarCondition: 0
+  twoStarCondition: 1
+  oneStarCondition: 2
+  crossIndicator: {fileID: 1640349074}
+  crossDisplayDuration: 0.3
+  fallenTries: 0
+  busController: {fileID: 1109257074}
+  isProcessing: 0
+  multiplexerVisualizer: {fileID: 802006894}
+  registerSrcAVisualizer: {fileID: 1319270238}
+  registerSrcBVisualizer: {fileID: 373000919}
+  registerOutputVisualizer: {fileID: 1397563056}
+  buses:
+    srcAToMux: {fileID: 1226422104}
+    srcBToMux: {fileID: 1719315176}
+    muxToOutput: {fileID: 785921907}
 --- !u!4 &1109257073
 Transform:
   m_ObjectHideFlags: 0
@@ -1891,6 +1901,7 @@ MonoBehaviour:
   speedSlider: {fileID: 2124537232}
   spherePrefab: {fileID: 6425462522399718016, guid: 1d0544c75d85507478621a5dee2e0bd8, type: 3}
   movementSpeed: 7
+  poolPreWarmCount: 2
   busSegments:
   - {fileID: 1226422104}
   - {fileID: 1719315176}
@@ -3276,7 +3287,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2136800545}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 1
@@ -3328,7 +3339,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
