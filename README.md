@@ -34,7 +34,7 @@ If you want to play the game without opening the project in Unity, you can find 
 
 ## Technical Specifications
 
-* **Engine:** Unity 6 (Version: 6000.3.11f1 LTS)
+* **Engine:** Unity 6 (Version: 6000.4.10f1)
 * **Target Platforms:** Android (Primary), Windows (Evaluation Build)
 * **Render Pipeline:** Universal Render Pipeline (URP)
 * **Version Control:** Transitioned from Unity Version Control to Git.
@@ -46,7 +46,7 @@ If you want to play the game without opening the project in Unity, you can find 
 To explore the source code or build the project yourself:
 
 1.  Install **Unity Hub**.
-2.  Install **Unity 6 (6000.3.11f1)**.
+2.  Install **Unity 6 (6000.4.10f1)**.
 3.  Clone this repository:  
     `git clone https://github.com/GGalya1/Bachelor-project-at-TU-Darmstadt.git`
 4.  Add the project to Unity Hub and open it.
