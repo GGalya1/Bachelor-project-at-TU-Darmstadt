@@ -307,9 +307,9 @@ public class LevelFiveRegisseur : BaseLevelRegisseur<LevelFiveState>
 
     protected override void UpdateVisualizers()
     {
-        _infoSrcARegister.Display("Register 1", $"{_srcA.Output}");
+        _infoSrcARegister.Display("Register 1", _srcA.Output);
         _infoSrcBRegister.Display("Register 2", RiscVDecoder.CommandBuilder((uint)_srcB.Output));
-        _infoOutputRegister.Display("Register 3", $"{_output.Output}");
+        _infoOutputRegister.Display("Register 3", _output.Output);
         registerSrcAVisualizer.ForceUpdateWriteEnableVisualization(_srcA.WriteEnable);
         registerSrcBVisualizer.ForceUpdateWriteEnableVisualization(_srcB.WriteEnable);
         registerOutputVisualizer.ForceUpdateWriteEnableVisualization(_output.WriteEnable);

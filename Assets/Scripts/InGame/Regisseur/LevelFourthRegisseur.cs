@@ -280,8 +280,8 @@ public class LevelFourthRegisseur : BaseLevelRegisseur<LevelThreeState>
 
     protected override void UpdateVisualizers()
     {
-        _infoSrcA.Display("Register 1", $"{_srcA.Output}");
-        _infoSrcB.Display("Register 2", $"{_srcB.Output}");
+        _infoSrcA.Display("Register 1", _srcA.Output);
+        _infoSrcB.Display("Register 2", _srcB.Output);
         registerOutputVisualizer.UIRegisterPanel.Display(
             $"{_dataInstructionMemory.Memory[0]}",
             $"{_dataInstructionMemory.Memory[4]}",

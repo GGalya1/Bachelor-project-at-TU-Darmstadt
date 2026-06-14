@@ -676,13 +676,13 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
     {
         UpdateSidePanel();
 
-        _infoPCRegister.Display("PC Register", $"{_pc.Output}");
-        _infoOldPCRegister.Display("Old PC Register", $"{_oldPC.Output}");
+        _infoPCRegister.Display("PC Register", _pc.Output);
+        _infoOldPCRegister.Display("Old PC Register", _oldPC.Output);
         _infoInstructionRegister.Display("Instruction Register", RiscVDecoder.CommandBuilder((uint)_instructionReg.Output));
-        _infoDataRegister.Display("Data Register", $"{_dataReg.Output}");
-        _infoSrcARegister.Display("SrcA Register", $"{_srcA.Output}");
-        _infoSrcBRegister.Display("SrcB Register", $"{_srcB.Output}");
-        _infoAluOutRegister.Display("ALU Out Register", $"{_aluOutReg.Output}");
+        _infoDataRegister.Display("Data Register", _dataReg.Output);
+        _infoSrcARegister.Display("SrcA Register", _srcA.Output);
+        _infoSrcBRegister.Display("SrcB Register", _srcB.Output);
+        _infoAluOutRegister.Display("ALU Out Register", _aluOutReg.Output);
 
         memoryVisualizer.UIRegisterPanel.Display(
             RiscVDecoder.CommandBuilder((uint)_dataInstructionMemory.Memory[0]),
