@@ -283,10 +283,10 @@ public class LevelFourthRegisseur : BaseLevelRegisseur<LevelThreeState>
         _infoSrcA.Display("Register 1", _srcA.Output);
         _infoSrcB.Display("Register 2", _srcB.Output);
         registerOutputVisualizer.UIRegisterPanel.Display(
-            $"{_dataInstructionMemory.Memory[0]}",
-            $"{_dataInstructionMemory.Memory[4]}",
-            $"{_dataInstructionMemory.Memory[8]}",
-            $"{_dataInstructionMemory.Memory[12]}"
+            _dataInstructionMemory.Memory[0],
+            _dataInstructionMemory.Memory[4],
+            _dataInstructionMemory.Memory[8],
+            _dataInstructionMemory.Memory[12]
         );
 
         registerSrcAVisualizer.ForceUpdateWriteEnableVisualization(_srcA.WriteEnable);

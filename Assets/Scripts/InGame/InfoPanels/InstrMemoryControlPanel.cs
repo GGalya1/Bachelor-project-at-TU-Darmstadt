@@ -20,4 +20,12 @@ public class InstrMemoryControlPanel: InfoPanelUI
         thirdAddressValue.SetText("{0}", thirdVal);
         fourthAddressValue.SetText("{0}", fourthVal);
     }
+    
+    public void Display(string firstVal, string secondVal, string thirdVal, string fourthVal)
+    {
+        firstAddressValue.text =  firstVal;
+        secondAddressValue.text =  secondVal;
+        thirdAddressValue.text =  thirdVal;
+        fourthAddressValue.text =  fourthVal;
+    }
 }
