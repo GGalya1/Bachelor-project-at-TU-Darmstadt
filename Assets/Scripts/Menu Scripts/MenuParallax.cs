@@ -39,8 +39,8 @@ public class MenuParallax : MonoBehaviour
         if (GravitySensor.current != null)
             InputSystem.EnableDevice(GravitySensor.current);
 
-        if (Gyroscope.current != null)
-            InputSystem.EnableDevice(Gyroscope.current);
+        if (UnityEngine.InputSystem.Gyroscope.current != null)
+            InputSystem.EnableDevice(UnityEngine.InputSystem.Gyroscope.current);
 #endif
     }
 
@@ -55,7 +55,7 @@ public class MenuParallax : MonoBehaviour
             _gyroPercent.y = Mathf.Clamp(gravity.y * _gyroSensitivity, -1f, 1f);
         }
 
-        Vector2 targetPos = _startPos + (_gyroPercent * _amount);
+        Vector2 targetPos = _startPos + (_gyroPercent * amount);
 #else
         if (_mouse == null) return;
 

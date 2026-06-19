@@ -58,6 +58,8 @@ public class BusController : MonoBehaviour
 
     private void OnDestroy()
     {
+        StopAllCoroutines();
+        
         // all objects in pool need to be removed manual
         foreach (var signal in _activeSignals)
             if (signal != null)
