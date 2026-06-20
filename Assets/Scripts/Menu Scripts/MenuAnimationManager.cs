@@ -15,7 +15,7 @@ public class MenuAnimationManager : MonoBehaviour
 
     [FormerlySerializedAs("_hiddenPosition")]
     [Tooltip("The vertical offset for the panel's hidden state.")]
-    [SerializeField] private Vector2 hiddenPosition = new Vector2(0f, -1000f);
+    [SerializeField] private Vector2 hiddenPosition = new (0f, -1000f);
 
     [Header("References")]
     [SerializeField] private CanvasGroup bgGroup;
@@ -27,6 +27,10 @@ public class MenuAnimationManager : MonoBehaviour
     [Header("Easing")]
     [SerializeField] private Ease showEase = Ease.OutBack;
     [SerializeField] private Ease hideEase = Ease.InQuint;
+    
+    [Header("Show animation")]
+    [SerializeField] private float showStartScale = 0.92f;
+    [SerializeField] private float panelShowDelay = 0.08f;
 
     private void Awake()
     {
@@ -64,9 +68,17 @@ public class MenuAnimationManager : MonoBehaviour
         // Enable interactions immediately when showing starts
         group.interactable = true;
         group.blocksRaycasts = true;
+        
+        panelTransform.localScale = Vector3.one * showStartScale;
 
-        panelTransform.DOAnchorPos(Vector2.zero, fadeTime).SetEase(showEase);
-        group.DOFade(1, fadeTime);
+        DOTween.Sequence()
+            .SetDelay(panelShowDelay)
+            .Append(panelTransform.DOAnchorPos(Vector2.zero, fadeTime).SetEase(showEase))
+            .Join(panelTransform.DOScale(1f, fadeTime).SetEase(showEase))
+            .Join(group.DOFade(1f, fadeTime));
+        
+        // panelTransform.DOAnchorPos(Vector2.zero, fadeTime).SetEase(showEase);
+        // group.DOFade(1, fadeTime);
     }
 
     public void ShowLevelPanel()
@@ -130,10 +142,10 @@ public class MenuAnimationManager : MonoBehaviour
     private void OnDestroy()
     {
         // Clean up tweens to prevent memory leaks if the object is destroyed mid-animation
-        levelPanelRectTransform.DOKill();
-        levelPanelGroup.DOKill();
+        levelPanelRectTransform?.DOKill();
+        levelPanelGroup?.DOKill();
 
-        optionsPanelRectTransform.DOKill();
-        optionsPanelGroup.DOKill();
+        optionsPanelRectTransform?.DOKill();
+        optionsPanelGroup?.DOKill();
     }
 }

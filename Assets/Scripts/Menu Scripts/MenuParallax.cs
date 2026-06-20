@@ -19,7 +19,7 @@ public class MenuParallax : MonoBehaviour
 
 #if UNITY_ANDROID || UNITY_IOS
     [Header("Mobile Settings")]
-    [SerializeField] float _gyroSensitivity = 8.0f;
+    [SerializeField] float _gyroSensitivity = 2.5f;
     private Vector2 _gyroPercent;
 #endif
 
@@ -47,15 +47,9 @@ public class MenuParallax : MonoBehaviour
     private void Update()
     {
 #if UNITY_ANDROID || UNITY_IOS
-        if (GravitySensor.current != null)
-        {
-            Vector3 gravity = GravitySensor.current.gravity.ReadValue();
+        UpdateGyro();
 
-            _gyroPercent.x = Mathf.Clamp(gravity.x * _gyroSensitivity, -1f, 1f);
-            _gyroPercent.y = Mathf.Clamp(gravity.y * _gyroSensitivity, -1f, 1f);
-        }
-
-        Vector2 targetPos = _startPos + (_gyroPercent * amount);
+        var targetPos = _startPos + (_gyroPercent * amount);
 #else
         if (_mouse == null) return;
 
@@ -81,4 +75,16 @@ public class MenuParallax : MonoBehaviour
             smoothTime
         );
     }
+    
+#if UNITY_ANDROID || UNITY_IOS
+    private void UpdateGyro()
+    {
+        if (GravitySensor.current == null) return;
+ 
+        var g = GravitySensor.current.gravity.ReadValue();
+ 
+        _gyroPercent.x =  Mathf.Clamp(g.x / 9.81f * _gyroSensitivity, -1f, 1f);
+        _gyroPercent.y = -Mathf.Clamp(g.z / 9.81f * _gyroSensitivity, -1f, 1f);
+    }
+#endif
 }

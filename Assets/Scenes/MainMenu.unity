@@ -314,6 +314,11 @@ MonoBehaviour:
   hoverScale: 1.1
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &11767603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -467,6 +472,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &37714862
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -770,6 +780,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &60190623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1196,6 +1211,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &86958003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1538,6 +1558,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &96975204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1827,6 +1852,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &103896854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1980,6 +2010,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &107290375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2421,6 +2456,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &155306489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2698,6 +2738,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amount: 20
   smoothTime: 0.3
+  _gyroSensitivity: 2.5
 --- !u!1 &182605582
 GameObject:
   m_ObjectHideFlags: 0
@@ -3075,6 +3116,11 @@ MonoBehaviour:
   hoverScale: 1.1
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &238356394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3227,6 +3273,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &244227496
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3393,6 +3444,11 @@ MonoBehaviour:
   hoverScale: 1.1
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &276181771
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3897,6 +3953,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &349742746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4133,6 +4194,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &361473130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4422,6 +4488,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &380471638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4575,6 +4646,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &384370528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4773,6 +4849,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amount: 20
   smoothTime: 0.3
+  _gyroSensitivity: 2.5
 --- !u!1 &397335367
 GameObject:
   m_ObjectHideFlags: 0
@@ -5407,9 +5484,16 @@ MonoBehaviour:
   - Mehrtaktprozessor
   fadeDuration: 0.3
   totalPages: 3
-  duration: 0.5
+  duration: 0.3
   animEase: 9
-  dragThreshold: 0
+  edgeBounceStrength: 18
+  edgeBounceDuration: 0.4
+  enableInertiaTilt: 1
+  inertiaMode: 1
+  tiltAngle: 5
+  waveStagger: 0.03
+  settleStartAt: 0.72
+  settleDuration: 0.42
 --- !u!114 &439871402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5431,6 +5515,8 @@ MonoBehaviour:
   optionsPanelRectTransform: {fileID: 880441339}
   showEase: 27
   hideEase: 14
+  showStartScale: 0.92
+  panelShowDelay: 0.08
 --- !u!1 &443015068
 GameObject:
   m_ObjectHideFlags: 0
@@ -5817,6 +5903,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amount: 20
   smoothTime: 0.3
+  _gyroSensitivity: 2.5
 --- !u!1 &501632334
 GameObject:
   m_ObjectHideFlags: 0
@@ -5875,6 +5962,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &501632337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6280,6 +6372,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amount: 20
   smoothTime: 0.3
+  _gyroSensitivity: 2.5
 --- !u!1 &563943015
 GameObject:
   m_ObjectHideFlags: 0
@@ -6353,6 +6446,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &563943019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6502,6 +6600,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -6999,6 +7098,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amount: 20
   smoothTime: 0.3
+  _gyroSensitivity: 2.5
 --- !u!1 &674019264
 GameObject:
   m_ObjectHideFlags: 0
@@ -7356,6 +7456,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &803272895
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7509,6 +7614,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &809336953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7933,6 +8043,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &867390410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9160,6 +9275,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &974701310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9312,6 +9432,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &980164673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9464,6 +9589,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &991712099
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9709,6 +9839,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &998979507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10185,6 +10320,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1076859142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10353,6 +10493,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -10969,6 +11110,11 @@ MonoBehaviour:
   hoverScale: 1.1
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1147036161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11290,6 +11436,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amount: 20
   smoothTime: 0.3
+  _gyroSensitivity: 2.5
 --- !u!1 &1229725798
 GameObject:
   m_ObjectHideFlags: 0
@@ -11348,6 +11495,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1229725801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11652,6 +11804,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1245436481
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12299,6 +12456,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amount: 20
   smoothTime: 0.3
+  _gyroSensitivity: 2.5
 --- !u!1 &1277021700
 GameObject:
   m_ObjectHideFlags: 0
@@ -12618,6 +12776,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1297429310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12907,6 +13070,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -13504,6 +13668,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1717940097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13656,6 +13825,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1721605176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13893,6 +14067,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1753622833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14045,6 +14224,11 @@ MonoBehaviour:
   hoverScale: 1.1
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1819042444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14212,6 +14396,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -14326,6 +14511,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1829462834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14703,6 +14893,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1890264276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15017,6 +15212,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &1931998020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15306,6 +15506,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &2008742574
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15456,6 +15661,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -15536,6 +15742,11 @@ MonoBehaviour:
   hoverScale: 1.1
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &2052459661
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15720,6 +15931,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   amount: 20
   smoothTime: 0.3
+  _gyroSensitivity: 2.5
 --- !u!1 &2071746323
 GameObject:
   m_ObjectHideFlags: 0
@@ -15797,6 +16009,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -16024,6 +16237,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &2093029855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16190,6 +16408,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &2101566557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16606,6 +16829,11 @@ MonoBehaviour:
   hoverScale: 1.05
   onEnterEase: 6
   onExitEase: 6
+  hoverDuration: 0.2
+  clickSquish: 0.12
+  clickPressDur: 0.1
+  clickReleaseDur: 0.25
+  clickPunchDur: 0.22
 --- !u!114 &2124223943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16756,6 +16984,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
