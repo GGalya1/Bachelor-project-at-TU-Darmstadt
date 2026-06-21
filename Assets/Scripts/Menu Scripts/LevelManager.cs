@@ -93,9 +93,18 @@ public class LevelManager : MonoBehaviour
 
             if (nextData != null)
             {
-                FullProcessorRegisseur.Initial = (ProcessorInitialState)nextData;
-
-                StartCoroutine(LoadWithTransition(GameConstants.FullProcessorSceneIndex));
+                
+                
+                if (currentIndex == GameConstants.OneTickProcessorSceneIndex)
+                {
+                    OneTickRegisseur.Initial = (OneTickProcessorInitialState)nextData;
+                    StartCoroutine(LoadWithTransition(GameConstants.OneTickProcessorSceneIndex));
+                }
+                else
+                {
+                    FullProcessorRegisseur.Initial = (ProcessorInitialState)nextData;
+                    StartCoroutine(LoadWithTransition(GameConstants.FullProcessorSceneIndex));
+                }
             }
             else
             {

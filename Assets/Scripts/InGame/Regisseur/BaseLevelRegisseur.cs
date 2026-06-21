@@ -69,7 +69,7 @@ public abstract class BaseLevelRegisseur<TState, TBus> : MonoBehaviour
     protected WaitUntil WaitNoSignals;
     
     [Header("Bus Segments")]
-    protected TBus buses;
+    public TBus buses;
 
 
     #region ABSTRACT METHODS (Unique to each level)

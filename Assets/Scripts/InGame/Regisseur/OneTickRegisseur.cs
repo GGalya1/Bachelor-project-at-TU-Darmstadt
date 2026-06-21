@@ -163,7 +163,7 @@ public struct OneTickProcessorLevelState
 public class OneTickRegisseur : BaseLevelRegisseur<OneTickProcessorLevelState, OneTickBusSegments>
 {
     [Header("Initial values for level")]
-    public static ProcessorInitialState Initial;
+    public static OneTickProcessorInitialState Initial;
 
     [Header("Processor Specific Components")] [SerializeField]
     private RegisterVisualizer registerPCVisualizer;
@@ -203,16 +203,16 @@ public class OneTickRegisseur : BaseLevelRegisseur<OneTickProcessorLevelState, O
         _pc = new Register(Initial.pcRegisterInitialValue) { WriteEnable = true };
 
         _instructionMemory = new DataInstMemory { MemoryWrite = false };
-        _instructionMemory.LoadWord(0, Initial.firstMemoWord);
-        _instructionMemory.LoadWord(4, Initial.secondMemoWord);
-        _instructionMemory.LoadWord(8, Initial.thirdMemoWord);
-        _instructionMemory.LoadWord(12, Initial.fourthMemoWord);
+        _instructionMemory.LoadWord(0, Initial.firstInstructionWord);
+        _instructionMemory.LoadWord(4, Initial.secondInstructionWord);
+        _instructionMemory.LoadWord(8, Initial.thirdInstructionWord);
+        _instructionMemory.LoadWord(12, Initial.fourthInstructionWord);
 
         _dataMemory = new DataInstMemory { MemoryWrite = false };
-        _dataMemory.LoadWord(0, 0);
-        _dataMemory.LoadWord(4, 0);
-        _dataMemory.LoadWord(8, 0);
-        _dataMemory.LoadWord(12, 0);
+        _dataMemory.LoadWord(0, Initial.firstDataWord);
+        _dataMemory.LoadWord(4, Initial.secondDataWord);
+        _dataMemory.LoadWord(8, Initial.thirdDataWord);
+        _dataMemory.LoadWord(12, Initial.fourthDataWord);
 
         _registerFile = new RegisterFile { RegisterWriteEnable = false };
         _registerFile.InitializeRegisters(new[]
