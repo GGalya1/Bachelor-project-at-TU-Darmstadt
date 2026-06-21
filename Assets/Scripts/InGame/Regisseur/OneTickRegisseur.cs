@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class OneTickBusSegments
+public class OneTickBusSegments: IBusSegmentProvider
 {
     [Header("IF - Instruction Fetch")] [Tooltip("PC -> Instruction Memory address input")]
     public LineRenderer pcToInstrMem;
@@ -160,7 +160,7 @@ public struct OneTickProcessorLevelState
     public int MuXresultPath;
 }
 
-public class OneTickRegisseur : BaseLevelRegisseur<OneTickProcessorLevelState>
+public class OneTickRegisseur : BaseLevelRegisseur<OneTickProcessorLevelState, OneTickBusSegments>
 {
     [Header("Initial values for level")]
     public static ProcessorInitialState Initial;
@@ -183,9 +183,6 @@ public class OneTickRegisseur : BaseLevelRegisseur<OneTickProcessorLevelState>
 
     [SerializeField] private Blinker numberBlinker;
 
-    [Header("Bus Segments")] [SerializeField]
-    private OneTickBusSegments buses;
-
 
     private int _currentBus; // [0, 3]
     private DataInstMemory _dataMemory;
@@ -199,13 +196,6 @@ public class OneTickRegisseur : BaseLevelRegisseur<OneTickProcessorLevelState>
     protected void Awake()
     {
         levelManager.SetLevelDialogue(Initial.customDialogueGraph);
-    }
-
-    protected override void Start()
-    {
-        base.Start();
-        buses.RegisterAll(busController);
-        WaitNoSignals = new WaitUntil(() => busController.NoActiveSignals);
     }
 
     protected override void OnLevelStart()

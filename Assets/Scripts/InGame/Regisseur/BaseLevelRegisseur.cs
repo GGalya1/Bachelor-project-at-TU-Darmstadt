@@ -7,7 +7,9 @@ using DG.Tweening;
 using UnityEngine.Serialization;
 
 // A base class for all levels that manages time, history, and completion.
-public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: struct
+public abstract class BaseLevelRegisseur<TState, TBus> : MonoBehaviour 
+    where TState: struct
+    where TBus: IBusSegmentProvider
 {
     [FormerlySerializedAs("_levelTargetDescription")]
     [Header("Level Content Configuration")]
@@ -65,6 +67,9 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
     
     // --- SIGNAL ANIMATION
     protected WaitUntil WaitNoSignals;
+    
+    [Header("Bus Segments")]
+    protected TBus buses;
 
 
     #region ABSTRACT METHODS (Unique to each level)
@@ -110,6 +115,9 @@ public abstract class BaseLevelRegisseur<TState> : MonoBehaviour where TState: s
         // 2. Initializing history
         TickStateValues = new TState[maxTickNumber]; // Can be _maxTickNumber + 1
         SaveCurrentStateAt(0);
+        
+        buses.RegisterAll(busController);
+        WaitNoSignals = new WaitUntil(() => busController.NoActiveSignals);
     }
 
     protected virtual void OnLevelStart()

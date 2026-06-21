@@ -59,7 +59,7 @@ internal readonly struct MehrtaktSignals
 }
 
 [System.Serializable]
-public class FullProcessorBusSegments
+public class FullProcessorBusSegments: IBusSegmentProvider
 {
     [Header("IF - Instruction Fetch")]
     [Tooltip("PC -> ADR MUX input (selects instruction memory address)")]
@@ -155,7 +155,7 @@ public enum ExerciseTyp {
     JAL = 3,
 }
 
-public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
+public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState, FullProcessorBusSegments>
 {
     [FormerlySerializedAs("_registerPCVisualizer")]
     [Header("Processor Specific Components")]
@@ -214,9 +214,6 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
 
 
     private int _currentBus; // [0, 10]
-    
-    [Header("Bus Segments")]
-    [SerializeField] private FullProcessorBusSegments buses;
 
     protected void Awake()
     {
@@ -226,7 +223,6 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
     {
         base.Start();
         buses.RegisterAll(busController);
-        WaitNoSignals = new WaitUntil(() => busController.NoActiveSignals);
     }
     protected override void OnLevelStart()
     {
