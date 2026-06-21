@@ -37,6 +37,27 @@ public struct ProcessorLevelState
     public int MuXresultPath;
 }
 
+internal readonly struct MehrtaktSignals
+{
+    public readonly int AdrMuxOut;
+    public readonly int SrcAMuxOut;
+    public readonly int SrcBMuxOut;
+    public readonly int AluResult;
+    public readonly int ResultMuxOut;
+
+    public MehrtaktSignals(
+        int adrMuxOut, int srcAMuxOut, int srcBMuxOut, 
+        int aluResult, int resultMuxOut
+    )
+    {
+        AdrMuxOut = adrMuxOut;
+        SrcAMuxOut = srcAMuxOut;
+        SrcBMuxOut = srcBMuxOut;
+        AluResult = aluResult;
+        ResultMuxOut = resultMuxOut;
+    }
+}
+
 [System.Serializable]
 public class FullProcessorBusSegments
 {
@@ -269,6 +290,21 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
 
         UpdateVisualizers();
     }
+    
+    private MehrtaktSignals ComputeMehrtaktSignals()
+    {
+        var ext = Extender.Evaluate(extenderVisualizer.CurrentAluOperation, (uint)_instructionReg.Output);
+        var srcA = EvaluateMux(srcAmuxVisualizer.CurrentChosenMuxPath, _pc.Output, _oldPC.Output, _srcA.Output);
+        var srcB = EvaluateMux(srcBmuxVisualizer.CurrentChosenMuxPath, _srcB.Output, ext, 4);
+        var alu = Alu.Calculate(srcA, srcB, aluVisualizer.CurrentAluOperation);
+        var result = EvaluateMux(resultMuxVisualizer.CurrentChosenMuxPath, _aluOutReg.Output, _dataReg.Output, alu);
+        var adr = EvaluateMux(adrMuxVisualizer.CurrentChosenMuxPath, _pc.Output, result, 0);
+
+        return new MehrtaktSignals(
+            adr, srcA,
+            srcB, alu, result
+        );
+    }
 
     protected override void ApplyState(ProcessorLevelState s)
     {
@@ -389,12 +425,12 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
         _dataInstructionMemory.MemoryWrite = memoryVisualizer.isWriteEnabled;
         _registerFile.RegisterWriteEnable = registerFileVisualizer.isWriteEnabled;
 
-
+        var sig = ComputeMehrtaktSignals();
 
         // implementation
 
         #region first step (memory)
-        var tmpAddress = CalculateAddressMux();
+        var tmpAddress = sig.AdrMuxOut;
         if (_dataInstructionMemory.Memory.ContainsKey(tmpAddress))
         {
             _instructionReg.Input = _dataInstructionMemory.Memory[tmpAddress];
@@ -428,7 +464,8 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
         #endregion
 
         #region third step (ALU)
-        _aluOutReg.Input = CalculateAlu();
+
+        _aluOutReg.Input = sig.AluResult;
         _dataInstructionMemory.WriteData = _srcB.Output;
         #endregion
 
@@ -439,7 +476,7 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
             // _registerFile.WriteData = TickStateValues[TickCounter - 2].RegisterInstrValue;
         }
 
-        var tmpResult = CalculateResultMux();
+        var tmpResult = sig.ResultMuxOut;
         _registerFile.WriteData = tmpResult;
         _pc.Input = tmpResult;
         #endregion
@@ -487,11 +524,13 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
         busController.StartBusSignal(buses.pcToAdrMux, _pc.Output);
         busController.StartBusSignal(buses.pcToOldPcReg, _pc.Output);
         busController.StartBusSignal(buses.pcToPcAdder, _pc.Output);
+        
+        var sig = ComputeMehrtaktSignals();
 
-        var muxSrcA = CalculateSrcAMux();
-        var muxSrcB = CalculateSrcBMux();
-        var output = CalculateResultMux();
-        var addressValue = CalculateAddressMux();
+        var muxSrcA = sig.SrcAMuxOut;
+        var muxSrcB = sig.SrcBMuxOut;
+        var output = sig.ResultMuxOut;
+        var addressValue = sig.AdrMuxOut;
 
         yield return StartCoroutine(DelayedSignal(buses.adrMuxToMem, addressValue));
 
@@ -509,7 +548,7 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
         
         yield return StartCoroutine(DelayedSignals(buses.srcAMuxToSrcAReg, muxSrcA, buses.srcBMuxToSrcBReg, muxSrcB));
 
-        yield return StartCoroutine(DelayedSignal(buses.aluToAluOutReg, CalculateAlu()));
+        yield return StartCoroutine(DelayedSignal(buses.aluToAluOutReg, sig.AluResult));
 
         
         yield return StartCoroutine(DelayedSignal(buses.resultMuxToPC, output));
@@ -537,65 +576,43 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
         yield return WaitNoSignals;
     }
     private IEnumerator RunExecutionVisualisation() { // das noch korrigieren
+        var sig = ComputeMehrtaktSignals();
+        
         busController.StartBusSignal(buses.srcAMuxToSrcAReg, _srcA.Output);
         busController.StartBusSignal(buses.extToSrcBMux, Extender.Evaluate(extenderVisualizer.CurrentAluOperation, (uint)_instructionReg.Output));
 
         yield return WaitNoSignals;
 
-        busController.StartBusSignal(buses.srcAMuxToAlu, CalculateSrcAMux());
-        busController.StartBusSignal(buses.srcBMuxToAlu, CalculateSrcBMux());
+        busController.StartBusSignal(buses.srcAMuxToAlu, sig.SrcAMuxOut);
+        busController.StartBusSignal(buses.srcBMuxToAlu, sig.SrcBMuxOut);
 
         yield return WaitNoSignals;
-        busController.StartBusSignal(buses.aluCombToAluOutReg, CalculateAlu());
+        busController.StartBusSignal(buses.aluCombToAluOutReg, sig.AluResult);
 
         yield return WaitNoSignals;
     }
     private IEnumerator RunWriteBackVisualisation() { // das noch korrigieren
+        var sig = ComputeMehrtaktSignals();
+        
         busController.StartBusSignal(buses.aluOutToResultMux, _aluOutReg.Output);
         busController.StartBusSignal(buses.aluOutToDataMem, _aluOutReg.Output);
 
         yield return WaitNoSignals;
 
-        var res = CalculateResultMux();
+        var res = sig.ResultMuxOut;
         busController.StartBusSignal(buses.resultMuxToPC, res);
         busController.StartBusSignal(buses.resultMuxToRegFile, res);
         busController.StartBusSignal(buses.resultMuxFanOut, res);
 
         yield return WaitNoSignals;
     }
-    
-    private int CalculateSrcAMux() { 
-        return EvaluateMux(srcAmuxVisualizer.CurrentChosenMuxPath, _pc.Output, _oldPC.Output, _srcA.Output);
-    }
-    private int CalculateSrcBMux()
-    {
-        return EvaluateMux(srcBmuxVisualizer.CurrentChosenMuxPath, _srcB.Output, Extender.Evaluate(extenderVisualizer.CurrentAluOperation, (uint)_instructionReg.Output), 4);
-    }
-    private int CalculateResultMux() { 
-        return EvaluateMux(resultMuxVisualizer.CurrentChosenMuxPath, _aluOutReg.Output, _dataReg.Output, CalculateAlu());
-    }
-    private int CalculateAddressMux() { 
-        return EvaluateMux(adrMuxVisualizer.CurrentChosenMuxPath, _pc.Output, CalculateResultMux(), 0);
-    }
-    
-    private int CalculateAlu() {
-        var muxSrcA = EvaluateMux(srcAmuxVisualizer.CurrentChosenMuxPath, _pc.Output, _oldPC.Output, _srcA.Output);
-
-        var extenderTmp = 0;
-        if (TickCounter > 0) {
-            extenderTmp =  TickStateValues[TickCounter - 1].RegisterInstrValue;
-        }
-        var muxSrcB = EvaluateMux(srcBmuxVisualizer.CurrentChosenMuxPath, 
-            _srcB.Output, 
-            Extender.Evaluate(extenderVisualizer.CurrentAluOperation, (uint)extenderTmp), 
-            4);
-        return Alu.Calculate(muxSrcA, muxSrcB, aluVisualizer.CurrentAluOperation);
-    }
 
     private IEnumerator ReverseFetchVisualisation() { // noch zu korrigieren
+        var sig = ComputeMehrtaktSignals();
+        
         yield return StartCoroutine(DelayedSignal(buses.resultMuxToPC, _pc.Input, true));
 
-        yield return StartCoroutine(DelayedSignal(buses.aluToAluOutReg, CalculateAlu(), true));
+        yield return StartCoroutine(DelayedSignal(buses.aluToAluOutReg, sig.AluResult, true));
 
         yield return StartCoroutine(DelayedSignals(buses.srcAMuxToSrcAReg, _srcA.Output, buses.srcBMuxToSrcBReg, _srcB.Output, true, true));
 
@@ -624,7 +641,9 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
     } 
     private IEnumerator ReverseExecutionVisualisation() // das noch korrigieren
     {
-        busController.StartBusSignal(buses.aluCombToAluOutReg, CalculateAlu(), true);
+        var sig = ComputeMehrtaktSignals();
+        
+        busController.StartBusSignal(buses.aluCombToAluOutReg, sig.AluResult, true);
 
         yield return WaitNoSignals;
 
@@ -633,14 +652,16 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState>
 
         yield return WaitNoSignals;
 
-        busController.StartBusSignal(buses.srcAMuxToAlu, CalculateSrcAMux(), true);
-        busController.StartBusSignal(buses.srcBMuxToAlu, CalculateSrcBMux(), true);
+        busController.StartBusSignal(buses.srcAMuxToAlu, sig.SrcAMuxOut, true);
+        busController.StartBusSignal(buses.srcBMuxToAlu, sig.SrcBMuxOut, true);
 
         yield return WaitNoSignals;
     }
     private IEnumerator ReverseWriteBackVisualisation() // das noch korrigieren
     {
-        var res = CalculateResultMux();
+        var sig = ComputeMehrtaktSignals();
+        
+        var res = sig.ResultMuxOut;
         busController.StartBusSignal(buses.resultMuxToPC, res, true);
         busController.StartBusSignal(buses.resultMuxToRegFile, res, true);
         busController.StartBusSignal(buses.resultMuxFanOut, res, true);

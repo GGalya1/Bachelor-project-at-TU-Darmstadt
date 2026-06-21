@@ -232,6 +232,12 @@ public class OneTickRegisseur : BaseLevelRegisseur<OneTickProcessorLevelState>
             0, 12, 53, 65, 29, 60, 61, 0,
             25, 54, 0, 28, 70, 30, 31, 0
         });
+        
+        // Caching of UI panels for visualizers
+        _infoPCRegister = registerPCVisualizer.UIRegisterPanel;
+        _infoInstructionMemory = instructionMemoryVisualizer.UIRegisterPanel;
+        _infoDataMemory = dataMemoryVisualizer.UIRegisterPanel;
+        
 
         UpdateVisualizers();
     }
