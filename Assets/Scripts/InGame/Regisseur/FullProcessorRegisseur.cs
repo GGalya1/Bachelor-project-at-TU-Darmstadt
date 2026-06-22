@@ -467,10 +467,13 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState, Fu
 
         #region fourth step (WB)
         
-        if (TickCounter - 2 >= 0) {
+        /*if (TickCounter - 2 >= 0) {
             _registerFile.WriteAdress = ((TickStateValues[TickCounter - 2].RegisterInstrValue >> 7) & 0x1F);
             // _registerFile.WriteData = TickStateValues[TickCounter - 2].RegisterInstrValue;
-        }
+        }*/
+        
+        _registerFile.WriteAdress = (_instructionReg.Output >> 7) & 0x1F;
+
 
         var tmpResult = sig.ResultMuxOut;
         _registerFile.WriteData = tmpResult;
@@ -485,6 +488,7 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState, Fu
         _srcB.PreClockUpdate();
         _aluOutReg.PreClockUpdate();
         _dataInstructionMemory.PreClockUpdate();
+        _registerFile.PreClockUpdate();
 
         _pc.Clock();
         _oldPC.Clock();
@@ -558,7 +562,7 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState, Fu
         // _busController.StartBusSignal(_busController.busSegments[2], instructionReg.Output);
         busController.StartBusSignal(buses.instrToExtend, _instructionReg.Output);
 
-        var srcAValue = 0;
+        /*var srcAValue = 0;
         var srcBValue = 0;
         if (_dataInstructionMemory.Memory.TryGetValue(_instructionReg.Output, out var value))
         {
@@ -568,7 +572,15 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState, Fu
             srcBValue = value1;
         }
         yield return StartCoroutine(DelayedSignals(buses.rd1ToSrcAMux, srcAValue, buses.rd2ToSrcBMux, srcBValue));
-
+        */
+        
+        var rs1 = (_instructionReg.Output >> 15) & 0x1F;
+        var rs2 = (_instructionReg.Output >> 20) & 0x1F;
+        var srcAValue = _registerFile.Registers[rs1];
+        var srcBValue = _registerFile.Registers[rs2];
+        
+        yield return StartCoroutine(DelayedSignals(buses.rd1ToSrcAMux, srcAValue, buses.rd2ToSrcBMux, srcBValue));
+        
         yield return WaitNoSignals;
     }
     private IEnumerator RunExecutionVisualisation() { // das noch korrigieren
@@ -618,9 +630,9 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState, Fu
 
         yield return StartCoroutine(DelayedSignal(buses.adrMuxToMem, _dataInstructionMemory.Address, true));
 
-        busController.StartBusSignal(buses.pcToAdrMux, _oldPC.Input, true);
-        busController.StartBusSignal(buses.pcToOldPcReg, _oldPC.Input, true);
-        busController.StartBusSignal(buses.pcToPcAdder, _oldPC.Input, true);
+        busController.StartBusSignal(buses.pcToAdrMux, _pc.Output, true);
+        busController.StartBusSignal(buses.pcToOldPcReg, _pc.Output, true);
+        busController.StartBusSignal(buses.pcToPcAdder, _pc.Output, true);
 
         yield return WaitNoSignals;
     }
@@ -724,7 +736,7 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState, Fu
     }
 
 
-    private void UpdateSidePanel() {
+    /*private void UpdateSidePanel() {
         var containsKey = _pc.Output % 4 == 0 
                           && _pc.Output is <= 12 and >= 0
                           && _dataInstructionMemory.Memory.ContainsKey(_pc.Output)
@@ -802,6 +814,66 @@ public class FullProcessorRegisseur : BaseLevelRegisseur<ProcessorLevelState, Fu
         else
         {
             sidePanelInformer.SetStateInfo(StateName.UNKNOWN);
+        }
+    }*/
+    
+    private void UpdateSidePanel()
+    {
+        var stage = _currentBus % 4;
+ 
+        // FETCH (Phase 0): Liegt am PC eine gültige Instruktion?
+        if (stage == 0)
+        {
+            var hasFetch = _pc.Output % 4 == 0
+                           && _pc.Output is >= 0 and <= 12
+                           && _dataInstructionMemory.Memory.ContainsKey(_pc.Output)
+                           && _dataInstructionMemory.Memory[_pc.Output] > GameConstants.MinValidInstruction;
+            sidePanelInformer.SetStateInfo(hasFetch ? StateName.FETCH : StateName.UNKNOWN);
+            return;
+        }
+ 
+        // Phasen 1-3: InstrReg muss eine gültige Instruktion enthalten
+        if (_instructionReg.Output <= GameConstants.MinValidInstruction)
+        {
+            sidePanelInformer.SetStateInfo(StateName.UNKNOWN);
+            return;
+        }
+ 
+        var opcode = _instructionReg.Output & 0x7F;
+ 
+        switch (stage)
+        {
+            // DECODE: unabhängig vom Instruktionstyp immer gleich
+            case 1:
+                sidePanelInformer.SetStateInfo(StateName.DECODE);
+                break;
+            
+            case 2:
+                sidePanelInformer.SetStateInfo(opcode switch
+                {
+                    0x33 => StateName.EXECUTE_R,    // R-Typ
+                    0x13 => StateName.EXECUTE_I,    // I-Typ
+                    0x03 => StateName.MEM_ADDRESS,  // LOAD
+                    0x23 => StateName.MEM_ADDRESS,  // STORE
+                    0x63 => StateName.BEQ,          // Branch
+                    0x6F => StateName.JAL,          // JAL
+                    0x67 => StateName.JAL,          // JALR
+                    _    => StateName.UNKNOWN
+                });
+                break;
+            case 3:
+                sidePanelInformer.SetStateInfo(opcode switch
+                {
+                    0x33 => StateName.ALU_WB,    // R-Typ  Write-Back
+                    0x13 => StateName.ALU_WB,    // I-Typ  Write-Back
+                    0x03 => StateName.MEM_READ,  // LOAD   Memory-Read
+                    0x23 => StateName.MEM_WRITE, // STORE  Memory-Write
+                    0x63 => StateName.BEQ,       // Branch PC-Update
+                    0x6F => StateName.ALU_WB,    // JAL    Write-Back (rd = PC+4)
+                    0x67 => StateName.ALU_WB,    // JALR   Write-Back
+                    _    => StateName.UNKNOWN
+                });
+                break;
         }
     }
 
