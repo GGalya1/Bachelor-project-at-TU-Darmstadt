@@ -1,16 +1,15 @@
-using UnityEngine;
-
-public class AchievementIds : MonoBehaviour
+/// <summary>
+///     All Google Play achievement IDs, copied from the Play Console.
+/// </summary>
+public static class AchievementIds
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public const string FirstSteps = AchievementConstants.FirstSteps;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public const string AllLevelsComplete = AchievementConstants.AllLevelsComplete;
+
+    public const string PerfectFirstTry = AchievementConstants.PerfectFirstTry;
+
+    public const string ThreeStarSolution = AchievementConstants.ThreeStarSolution;
+
+    public const string SolutionCounter = AchievementConstants.SolutionCounter;
 }
