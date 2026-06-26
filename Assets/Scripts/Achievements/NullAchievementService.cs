@@ -1,16 +1,24 @@
-using UnityEngine;
+using System;
 
-public class NullAchievementService : MonoBehaviour
+/// <summary>
+/// No-op achievement service, currently used on all non-Android platforms.
+///
+/// All methods are intentionally empty - completely safe to call anywhere.
+/// No platform SDK required.
+/// </summary>
+public class NullAchievementService : IAchievementService
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public bool IsAuthenticated => false;
+
+    public void Initialize(Action<bool> onResult = null)
     {
-        
+        // Signal "not authenticated" without blocking anything
+        onResult?.Invoke(false);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public void Unlock(string achievementId) { }
+
+    public void Increment(string achievementId, int steps = 1) { }
+
+    public void ShowUI() { }
 }

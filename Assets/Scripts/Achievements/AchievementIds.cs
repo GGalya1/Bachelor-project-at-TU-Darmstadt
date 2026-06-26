@@ -7,9 +7,7 @@ public static class AchievementIds
 
     public const string AllLevelsComplete = AchievementConstants.AllLevelsComplete;
 
-    public const string PerfectFirstTry = AchievementConstants.PerfectFirstTry;
-
-    public const string ThreeStarSolution = AchievementConstants.ThreeStarSolution;
+    public const string PerfectTry = AchievementConstants.PerfectTry;
 
     public const string SolutionCounter = AchievementConstants.SolutionCounter;
 }
